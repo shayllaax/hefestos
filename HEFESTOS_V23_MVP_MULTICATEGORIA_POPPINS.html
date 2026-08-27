@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hefestos — Plataforma para sua obra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0b2431; --navy2:#123847; --green:#1e7a61; --green2:#2f9b7d;
+  --mint:#eaf5f0; --line:#dce7e3; --text:#19302b; --muted:#6c7c76;
+  --bg:#f7faf9; --white:#fff; --orange:#d98a3a; --shadow:0 10px 30px rgba(18,56,71,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Poppins,Arial,sans-serif;color:var(--text);background:var(--bg)}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{display:flex;min-height:100vh}
+.sidebar{width:250px;background:var(--navy);color:#fff;padding:25px 17px;position:fixed;inset:0 auto 0 0;z-index:10}
+.brand{padding:4px 13px 30px;font-weight:800;letter-spacing:.18em;font-size:19px}
+.brand small{display:block;letter-spacing:0;font-size:10px;font-weight:500;opacity:.55;margin-top:3px}
+.nav{display:flex;flex-direction:column;gap:7px}
+.nav button{border:0;background:transparent;color:#c7d7d3;text-align:left;padding:13px 14px;border-radius:11px;font-size:13px}
+.nav button.active,.nav button:hover{background:rgba(255,255,255,.09);color:#fff}
+.side-footer{position:absolute;bottom:25px;left:30px;right:30px;color:#9db2ad;font-size:11px;line-height:1.6}
+.main{margin-left:250px;width:calc(100% - 250px);min-height:100vh}
+.topbar{height:70px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 38px;position:sticky;top:0;z-index:5}
+.topbar span{font-size:12px;color:var(--muted)}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--mint);display:grid;place-items:center;color:var(--green);font-weight:700}
+.page{display:none;padding:38px;max-width:1250px;margin:auto}
+.page.active{display:block}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);font-weight:700}
+h1{font-size:30px;margin:7px 0 8px;letter-spacing:-.03em}
+h2{font-size:20px;margin:0 0 8px}
+h3{font-size:15px;margin:0 0 6px}
+.lead{color:var(--muted);font-size:13px;line-height:1.65;margin:0}
+.hero{background:linear-gradient(120deg,var(--navy),#164759);color:#fff;border-radius:22px;padding:34px;margin-bottom:25px;display:flex;justify-content:space-between;gap:30px;overflow:hidden}
+.hero h1{font-size:32px;max-width:650px;margin:6px 0 12px}.hero p{max-width:650px;color:#d4e4df;font-size:13px;line-height:1.7}
+.hero-badge{align-self:center;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);padding:20px;border-radius:18px;min-width:190px}
+.hero-badge strong{font-size:25px;display:block}.hero-badge span{font-size:11px;color:#bdd0cb}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.action{background:#fff;border:1px solid var(--line);border-radius:18px;padding:23px;text-align:left;box-shadow:var(--shadow);min-height:185px;transition:.18s}
+.action:hover{transform:translateY(-2px);border-color:#bdd6cc}
+.icon{font-size:25px;margin-bottom:20px}.action p{font-size:12px;color:var(--muted);line-height:1.6}
+.pill{display:inline-block;margin-top:12px;background:var(--mint);color:var(--green);padding:6px 9px;border-radius:999px;font-size:10px;font-weight:700}
+.section{margin-top:30px}.section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:13px}
+.categories{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.cat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px 10px;text-align:center;font-size:11px;font-weight:600}
+.cat span{display:block;font-size:23px;margin-bottom:7px}
+.empty{border:1px dashed #cbd9d4;border-radius:16px;padding:25px;text-align:center;color:var(--muted);background:#fff}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.problem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:22px}
+.choice{background:#fff;border:1px solid var(--line);border-radius:15px;padding:17px;text-align:left}
+.choice:hover{border-color:var(--green);box-shadow:var(--shadow)}
+.choice .emoji{font-size:23px}.choice strong{display:block;margin-top:9px;font-size:13px}.choice small{display:block;color:var(--muted);font-size:10px;line-height:1.5;margin-top:3px}
+.steps{display:flex;gap:7px;margin:20px 0}.step{font-size:10px;padding:7px 10px;border-radius:999px;background:#edf2f0;color:#71807a}.step.active{background:var(--green);color:#fff}
+label{font-size:11px;font-weight:600;display:block;margin:16px 0 7px}
+select,input{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px;background:#fff;color:var(--text);outline:none}
+.btn{border:0;background:var(--green);color:#fff;border-radius:10px;padding:11px 16px;font-size:12px;font-weight:700}
+.btn:hover{background:#17634f}.btn.secondary{background:#edf5f1;color:var(--green)}.btn.ghost{background:transparent;color:var(--green);border:1px solid var(--line)}
+.btn-row{display:flex;gap:9px;margin-top:20px}
+.result-box{margin-top:18px;border-left:4px solid var(--green);background:#f1f8f5;padding:17px;border-radius:0 13px 13px 0}
+.result-box ul{margin:8px 0 0;padding-left:20px;color:#596a63;font-size:12px;line-height:1.8}
+.product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+.product{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px}
+.product .tag{font-size:9px;color:var(--green);font-weight:700;text-transform:uppercase}
+.product h3{margin-top:7px}.product p{font-size:11px;color:var(--muted);line-height:1.55}
+.product .compat{font-size:10px;background:#f5f8f7;padding:8px;border-radius:8px;margin:10px 0}
+.searchbar{display:flex;gap:9px}.searchbar input{flex:1}
+.filters{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px}.filter{border:1px solid var(--line);background:#fff;padding:7px 11px;border-radius:999px;font-size:10px;color:var(--muted)}.filter.active{background:var(--green);color:#fff;border-color:var(--green)}
+.modal-back{position:fixed;inset:0;background:rgba(5,23,31,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:30}.modal-back.open{display:flex}.modal{background:#fff;border-radius:20px;width:min(620px,100%);padding:25px;max-height:90vh;overflow:auto}.close{float:right;border:0;background:#eef3f1;border-radius:50%;width:30px;height:30px}
+.partner{display:flex;justify-content:space-between;gap:15px;align-items:center;border:1px solid var(--line);padding:14px;border-radius:12px;margin-top:10px}.partner small{display:block;color:var(--muted)}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--navy);color:#fff;padding:12px 16px;border-radius:10px;font-size:11px;display:none;z-index:50}
+@media(max-width:950px){.sidebar{width:210px}.main{margin-left:210px;width:calc(100% - 210px)}.actions,.problem-grid{grid-template-columns:1fr}.categories{grid-template-columns:repeat(3,1fr)}.product-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:650px){.sidebar{display:none}.main{margin-left:0;width:100%}.page{padding:22px}.topbar{padding:0 20px}.hero{display:block}.hero-badge{margin-top:20px}.categories,.product-grid,.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand">HEFESTOS<small>TECNOLOGIA PARA OBRAS</small></div>
+  <nav class="nav">
+    <button class="active" data-page="inicio">⌂ &nbsp; Início</button>
+    <button data-page="problema">◈ &nbsp; Resolver um problema</button>
+    <button data-page="obra">⌂ &nbsp; Planejar minha obra</button>
+    <button data-page="catalogo">▦ &nbsp; Encontrar um produto</button>
+    <button data-page="projetos">□ &nbsp; Meus projetos</button>
+  </nav>
+  <div class="side-footer">Plataforma multimarcas para apoiar decisões no mercado de materiais de construção.</div>
+</aside>
+
+<main class="main">
+<header class="topbar"><span id="breadcrumb">Início</span><div class="avatar">H</div></header>
+
+<section class="page active" id="page-inicio">
+  <div class="hero">
+    <div>
+      <div class="eyebrow" style="color:#9ad2bf">Plataforma Hefestos</div>
+      <h1>A solução certa para cada necessidade da sua obra.</h1>
+      <p>A Hefestos conecta necessidades, problemas, soluções e materiais de construção de diferentes marcas em uma única plataforma.</p>
+      <button class="btn" onclick="go('problema')" style="margin-top:12px">Começar agora</button>
+    </div>
+    <div class="hero-badge"><strong>Necessidade → Solução</strong><span>→ Produto → Parceiro</span></div>
+  </div>
+  <div class="actions">
+    <button class="action" onclick="go('problema')"><div class="icon">🤖</div><h2>Resolver um problema</h2><p>Responda perguntas guiadas para entender possíveis causas e encontrar caminhos de solução e produtos relacionados.</p><span class="pill">Assistente Hefestos</span></button>
+    <button class="action" onclick="go('obra')"><div class="icon">🏗️</div><h2>Planejar minha obra</h2><p>Especifique materiais de acordo com ambiente, aplicação e características da obra.</p><span class="pill">Especificação</span></button>
+    <button class="action" onclick="go('catalogo')"><div class="icon">🔎</div><h2>Encontrar um produto</h2><p>Pesquise produtos por categoria e veja informações e parceiros relacionados.</p><span class="pill">Catálogo multimarcas</span></button>
+  </div>
+  <div class="section">
+    <div class="section-head"><div><div class="eyebrow">Materiais</div><h2>Categorias da plataforma</h2></div></div>
+    <div class="categories">
+      <div class="cat"><span>🧱</span>Revestimentos</div><div class="cat"><span>🧩</span>Rejuntes</div>
+      <div class="cat"><span>💧</span>Impermeabilização</div><div class="cat"><span>🪣</span>Argamassas</div>
+      <div class="cat"><span>🎨</span>Tintas</div><div class="cat"><span>🔧</span>Instalação</div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-head"><div><div class="eyebrow">Atividade</div><h2>Atividade recente</h2></div></div>
+    <div class="empty">Você ainda não possui análises ou projetos recentes.<br><button class="btn secondary" onclick="go('problema')" style="margin-top:12px">Iniciar uma análise</button></div>
+  </div>
+</section>
+
+<section class="page" id="page-problema">
+  <div class="eyebrow">Assistente Hefestos</div><h1>Estou com um problema na obra</h1>
+  <p class="lead">Escolha uma situação para iniciar uma análise guiada. A ferramenta apresenta possibilidades e caminhos de solução; quando necessário, procure avaliação profissional.</p>
+  <div id="problemStart" class="problem-grid">
+    <button class="choice" onclick="startProblem('Infiltração','💧')"><span class="emoji">💧</span><strong>Infiltração</strong><small>Entrada ou passagem de água.</small></button>
+    <button class="choice" onclick="startProblem('Mofo','🦠')"><span class="emoji">🦠</span><strong>Mofo</strong><small>Manchas, fungos ou sinais de umidade.</small></button>
+    <button class="choice" onclick="startProblem('Umidade','💦')"><span class="emoji">💦</span><strong>Umidade</strong><small>Excesso de umidade no ambiente ou superfície.</small></button>
+    <button class="choice" onclick="startProblem('Revestimento','🧱')"><span class="emoji">🧱</span><strong>Problema no revestimento</strong><small>Falhas, trincas, desplacamento ou acabamento.</small></button>
+    <button class="choice" onclick="startProblem('Rejunte','🧩')"><span class="emoji">🧩</span><strong>Problema no rejunte</strong><small>Falhas, manchas ou deterioração.</small></button>
+    <button class="choice" onclick="startProblem('Pintura','🎨')"><span class="emoji">🎨</span><strong>Problema na pintura</strong><small>Descascamento, manchas ou acabamento.</small></button>
+  </div>
+  <div id="problemFlow"></div>
+</section>
+
+<section class="page" id="page-obra">
+  <div class="eyebrow">Especificação</div><h1>Planejar minha obra</h1>
+  <p class="lead">Encontre materiais adequados para uma situação de obra. O sistema atual de compatibilidade entre revestimento e rejunte faz parte desta área.</p>
+  <div class="steps"><span class="step active">1. Necessidade</span><span class="step">2. Características</span><span class="step">3. Recomendação</span></div>
+  <div class="card">
+    <h2>O que você deseja especificar?</h2>
+    <div class="grid2">
+      <div><label>Categoria principal</label><select id="obraCat"><option>Revestimento</option><option>Rejunte</option><option>Revestimento + Rejunte</option><option>Impermeabilização</option><option>Argamassa</option><option>Tinta</option><option>Material de instalação</option></select></div>
+      <div><label>Ambiente</label><select id="obraAmb"><option>Banheiro</option><option>Cozinha</option><option>Sala</option><option>Quarto</option><option>Área externa</option><option>Fachada</option><option>Outro</option></select></div>
+      <div><label>Área</label><select id="obraArea"><option>Interna</option><option>Externa</option><option>Interna e externa</option></select></div>
+      <div><label>Exposição à água</label><select id="obraWater"><option>Alta</option><option>Média</option><option>Baixa</option></select></div>
+    </div>
+    <div class="btn-row"><button class="btn" onclick="specify()">Encontrar materiais compatíveis</button></div>
+    <div id="specResult"></div>
+  </div>
+</section>
+
+<section class="page" id="page-catalogo">
+  <div class="eyebrow">Catálogo multimarcas</div><h1>Encontrar um produto</h1>
+  <p class="lead">Pesquise por categoria ou produto. Os itens abaixo são dados demonstrativos para o MVP.</p>
+  <div class="card" style="margin-top:20px">
+    <div class="searchbar"><input id="search" placeholder="Ex.: impermeabilizante, tinta, rejunte..." oninput="renderProducts()"><button class="btn" onclick="renderProducts()">Buscar</button></div>
+    <div class="filters">
+      <button class="filter active" data-filter="" onclick="setFilter(this,'')">Todos</button>
+      <button class="filter" data-filter="Revestimentos" onclick="setFilter(this,'Revestimentos')">Revestimentos</button>
+      <button class="filter" data-filter="Rejuntes" onclick="setFilter(this,'Rejuntes')">Rejuntes</button>
+      <button class="filter" data-filter="Impermeabilização" onclick="setFilter(this,'Impermeabilização')">Impermeabilização</button>
+      <button class="filter" data-filter="Argamassas" onclick="setFilter(this,'Argamassas')">Argamassas</button>
+      <button class="filter" data-filter="Tintas" onclick="setFilter(this,'Tintas')">Tintas</button>
+      <button class="filter" data-filter="Instalação" onclick="setFilter(this,'Instalação')">Instalação</button>
+    </div>
+  </div>
+  <div id="products" class="product-grid"></div>
+</section>
+
+<section class="page" id="page-projetos">
+  <div class="eyebrow">Histórico</div><h1>Meus projetos</h1>
+  <p class="lead">Aqui aparecerão as análises e especificações que você salvar.</p>
+  <div id="projectList" class="section"></div>
+</section>
+</main>
+</div>
+
+<div class="modal-back" id="productModal"><div class="modal"><button class="close" onclick="closeModal()">×</button><div id="modalContent"></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const products=[
+ {name:"Revestimento Cerâmico A",brand:"Marca demonstrativa",cat:"Revestimentos",desc:"Produto demonstrativo para ambientes internos.",info:"Aplicação interna · verificar ficha técnica do fabricante."},
+ {name:"Revestimento Porcelanato B",brand:"Marca demonstrativa",cat:"Revestimentos",desc:"Produto demonstrativo para áreas selecionadas.",info:"Aplicação conforme especificação técnica."},
+ {name:"Rejunte Flexível A",brand:"Marca demonstrativa",cat:"Rejuntes",desc:"Produto demonstrativo para diferentes juntas.",info:"Compatibilidade depende da aplicação e largura da junta."},
+ {name:"Rejunte para Área Úmida B",brand:"Marca demonstrativa",cat:"Rejuntes",desc:"Produto demonstrativo para ambientes com água.",info:"Verificar indicação técnica antes da aplicação."},
+ {name:"Impermeabilizante A",brand:"Marca demonstrativa",cat:"Impermeabilização",desc:"Produto demonstrativo para sistemas de proteção contra água.",info:"A solução depende da causa e do sistema construtivo."},
+ {name:"Impermeabilizante B",brand:"Marca demonstrativa",cat:"Impermeabilização",desc:"Produto demonstrativo para áreas sujeitas à umidade.",info:"Verificar substrato, preparo e indicação do fabricante."},
+ {name:"Argamassa ACII A",brand:"Marca demonstrativa",cat:"Argamassas",desc:"Produto demonstrativo de assentamento.",info:"Selecionar de acordo com substrato, revestimento e ambiente."},
+ {name:"Argamassa ACI B",brand:"Marca demonstrativa",cat:"Argamassas",desc:"Produto demonstrativo para aplicação interna.",info:"Verificar condições de aplicação e ficha técnica."},
+ {name:"Tinta Acrílica A",brand:"Marca demonstrativa",cat:"Tintas",desc:"Produto demonstrativo para paredes.",info:"Preparação da superfície é essencial para o desempenho."},
+ {name:"Selante A",brand:"Marca demonstrativa",cat:"Instalação",desc:"Produto demonstrativo para vedação.",info:"Usar somente nas aplicações indicadas pelo fabricante."}
+];
+let filter="", projects=[];
+
+function go(page){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ document.getElementById('page-'+page).classList.add('active');
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+ const names={inicio:'Início',problema:'Resolver um problema',obra:'Planejar minha obra',catalogo:'Encontrar um produto',projetos:'Meus projetos'};
+ document.getElementById('breadcrumb').textContent=names[page];
+ if(page==='catalogo')renderProducts();
+ if(page==='projetos')renderProjects();
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>go(b.dataset.page));
+
+const problemData={
+"Infiltração":{questions:["Onde apareceu?","Quando começou?","Existe contato frequente com água?"],options:[["Banheiro","Durante/depois da obra","Sim"],["Área externa","Meses depois","Não"],["Fachada","Não sei","Não sei"]],causes:["falha ou ausência de impermeabilização","entrada de água por juntas, encontros ou fissuras","vazamento ou outra fonte de água"],solutions:["investigar a origem da água","avaliar impermeabilização e pontos de entrada","selecionar produtos de impermeabilização/reparo conforme a causa"] ,cats:["Impermeabilização","Argamassas"]},
+"Mofo":{questions:["Onde apareceu?","Quando começou?","O ambiente possui ventilação adequada?"],options:[["Banheiro","Depois da obra","Sim"],["Quarto","Meses depois","Não"],["Cozinha","Não sei","Não sei"]],causes:["umidade persistente","condensação ou ventilação insuficiente","infiltração ou falha de impermeabilização"],solutions:["identificar e eliminar a fonte de umidade","melhorar ventilação quando aplicável","avaliar produtos de tratamento e proteção adequados"],cats:["Impermeabilização","Tintas"]},
+"Umidade":{questions:["Onde apareceu?","Há contato com água?","Quando percebeu?"],options:[["Parede interna","Sim","Durante a obra"],["Piso","Não","Depois da obra"],["Teto","Não sei","Não sei"]],causes:["infiltração","condensação","falha de impermeabilização ou vedação"],solutions:["localizar a origem","avaliar impermeabilização/vedação","selecionar produtos conforme a causa confirmada"],cats:["Impermeabilização","Tintas"]},
+"Revestimento":{questions:["Qual é o problema?","Onde ocorre?","Quando apareceu?"],options:[["Desplacamento","Área interna","Durante a obra"],["Trinca/fissura","Área externa","Depois da obra"],["Acabamento","Banheiro","Não sei"]],causes:["preparação inadequada da base","produto de assentamento incompatível","movimentação ou condição de aplicação inadequada"],solutions:["avaliar base e assentamento","verificar compatibilidade dos materiais","considerar materiais adequados ao ambiente"],cats:["Revestimentos","Argamassas"]},
+"Rejunte":{questions:["Qual é o problema?","Onde ocorre?","Há contato frequente com água?"],options:[["Falhas","Banheiro","Sim"],["Manchas","Cozinha","Não"],["Deterioração","Área externa","Não sei"]],causes:["produto inadequado à aplicação","largura de junta incompatível","exposição à água/químicos ou manutenção inadequada"],solutions:["verificar indicação técnica do rejunte","confirmar largura da junta","considerar rejunte compatível com ambiente"],cats:["Rejuntes"]},
+"Pintura":{questions:["Qual é o problema?","Onde ocorre?","Existe umidade no local?"],options:[["Descascamento","Área interna","Sim"],["Manchas","Área externa","Não"],["Acabamento","Banheiro","Não sei"]],causes:["preparação inadequada da superfície","umidade na base","incompatibilidade entre sistema e condição de aplicação"],solutions:["verificar preparação","investigar umidade","selecionar sistema adequado à condição"],cats:["Tintas","Impermeabilização"]}
+};
+
+function startProblem(name,emoji){
+ document.getElementById('problemStart').style.display='none';
+ const d=problemData[name];
+ document.getElementById('problemFlow').innerHTML=`
+ <div class="card" style="margin-top:22px">
+  <div class="steps"><span class="step active">1. Situação</span><span class="step active">2. Perguntas</span><span class="step">3. Análise</span><span class="step">4. Produtos</span></div>
+  <h2>${emoji} ${name}</h2><p class="lead">Responda às perguntas para orientar a análise.</p>
+  <div class="grid2">${d.questions.map((q,i)=>`<div><label>${q}</label><select id="pq${i}">${d.options.map(o=>`<option>${o[i]}</option>`).join('')}</select></div>`).join('')}</div>
+  <div class="btn-row"><button class="btn" onclick="analyzeProblem('${name}','${emoji}')">Analisar situação</button><button class="btn ghost" onclick="resetProblem()">Escolher outro problema</button></div>
+ </div>`;
+}
+function analyzeProblem(name,emoji){
+ const d=problemData[name];
+ const vals=[0,1,2].map(i=>document.getElementById('pq'+i)?.value||'');
+ document.getElementById('problemFlow').innerHTML=`
+ <div class="card" style="margin-top:22px">
+ <div class="steps"><span class="step active">1. Situação</span><span class="step active">2. Perguntas</span><span class="step active">3. Análise</span><span class="step active">4. Produtos</span></div>
+ <h2>${emoji} Análise orientativa — ${name}</h2>
+ <p class="lead">Com base nas informações selecionadas, estas são possibilidades a considerar. A análise não substitui avaliação técnica presencial.</p>
+ <div class="result-box"><h3>Possíveis causas</h3><ul>${d.causes.map(x=>'<li>'+x+'</li>').join('')}</ul></div>
+ <div class="result-box"><h3>Possíveis caminhos de solução</h3><ul>${d.solutions.map(x=>'<li>'+x+'</li>').join('')}</ul></div>
+ <h3 style="margin-top:22px">Produtos relacionados</h3>
+ <div class="product-grid">${products.filter(p=>d.cats.includes(p.cat)).map(p=>productCard(p)).join('')}</div>
+ <div class="btn-row"><button class="btn secondary" onclick="saveProject('${name}')">Salvar análise</button><button class="btn ghost" onclick="resetProblem()">Nova análise</button></div>
+ </div>`;
+}
+function resetProblem(){document.getElementById('problemStart').style.display='grid';document.getElementById('problemFlow').innerHTML='';}
+function productCard(p){return `<div class="product"><div class="tag">${p.cat}</div><h3>${p.name}</h3><p>${p.desc}</p><div class="compat">${p.info}</div><button class="btn secondary" onclick='openProduct(${JSON.stringify(p)})'>Ver produto</button></div>`}
+function openProduct(p){
+ document.getElementById('modalContent').innerHTML=`<div class="eyebrow">${p.cat}</div><h2>${p.name}</h2><p class="lead"><strong>Marca:</strong> ${p.brand}</p><div class="result-box"><h3>Informações</h3><p style="font-size:12px;line-height:1.6">${p.info}</p></div><h3 style="margin-top:20px">Onde encontrar</h3><div class="partner"><div><strong>Loja parceira demonstrativa</strong><small>Consulte disponibilidade na sua região</small></div><button class="btn" onclick="toast('No MVP, o contato com o parceiro é demonstrativo.')">Ver parceiro</button></div><p style="font-size:10px;color:#84918d;margin-top:16px">Produto e parceiro exibidos como dados demonstrativos do MVP.</p>`;
+ document.getElementById('productModal').classList.add('open');
+}
+function closeModal(){document.getElementById('productModal').classList.remove('open')}
+function setFilter(el,f){filter=f;document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));el.classList.add('active');renderProducts()}
+function renderProducts(){
+ const q=(document.getElementById('search')?.value||'').toLowerCase();
+ const list=products.filter(p=>(!filter||p.cat===filter)&&(!q||(p.name+' '+p.brand+' '+p.cat+' '+p.desc).toLowerCase().includes(q)));
+ document.getElementById('products').innerHTML=list.map(productCard).join('')||'<div class="empty" style="grid-column:1/-1">Nenhum produto encontrado.</div>';
+}
+function specify(){
+ const cat=document.getElementById('obraCat').value, amb=document.getElementById('obraAmb').value, area=document.getElementById('obraArea').value, water=document.getElementById('obraWater').value;
+ let cats=cat==='Revestimento + Rejunte'?['Revestimentos','Rejuntes']:[cat+(cat==='Impermeabilização'?'':'')];
+ const mapped={'Revestimento':['Revestimentos','Argamassas'],'Rejunte':['Rejuntes'],'Impermeabilização':['Impermeabilização'],'Argamassa':['Argamassas'],'Tinta':['Tintas'],'Material de instalação':['Instalação']};
+ cats=mapped[cat]||cats;
+ const list=products.filter(p=>cats.includes(p.cat)).slice(0,4);
+ document.getElementById('specResult').innerHTML=`<div class="result-box"><h3>Recomendação inicial</h3><p style="font-size:12px;line-height:1.6">Para <strong>${amb}</strong>, em área <strong>${area.toLowerCase()}</strong> e com exposição à água <strong>${water.toLowerCase()}</strong>, estas categorias são as mais relacionadas à sua escolha. A compatibilidade final deve considerar as informações técnicas do produto e as condições da obra.</p></div><div class="product-grid">${list.map(productCard).join('')}</div><div class="btn-row"><button class="btn secondary" onclick="saveProject('${cat} — ${amb}')">Salvar especificação</button></div>`;
+}
+function saveProject(name){projects.unshift({name,date:new Date().toLocaleDateString('pt-BR')});toast('Análise salva em Meus projetos.');}
+function renderProjects(){
+ document.getElementById('projectList').innerHTML=projects.length?projects.map(p=>`<div class="card" style="margin-bottom:10px"><strong>${p.name}</strong><p class="lead">Salvo em ${p.date}</p></div>`).join(''):'<div class="empty">Você ainda não possui projetos salvos.<br><button class="btn secondary" onclick="go(\\'obra\\')" style="margin-top:12px">Criar especificação</button></div>';
+}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2600)}
+</script>
+</body>
+</html>
