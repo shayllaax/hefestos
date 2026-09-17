@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hefestos V40 — Plataforma Arquiteto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --petroleo:#18485F; --medio:#387798; --grafite:#272727; --acinzentado:#64727A;
+  --cinza:#D8E0E3; --linha:#E7ECEE; --fundo:#F6F8F8; --branco:#fff;
+  --verde:#2E8B68; --amarelo:#B9822B; --vermelho:#B94B4B;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Poppins,sans-serif;background:var(--fundo);color:var(--grafite);min-height:100vh}
+button,input{font:inherit} button{cursor:pointer}
+.app{display:flex;min-height:100vh}
+.sidebar{width:250px;background:#fff;border-right:1px solid var(--linha);position:fixed;inset:0 auto 0 0;z-index:20;display:flex;flex-direction:column}
+.brand{height:82px;padding:25px 27px;border-bottom:1px solid var(--linha);font-weight:700;color:var(--petroleo);font-size:21px;letter-spacing:-.03em}
+.brand small{display:block;font:500 9px 'JetBrains Mono';letter-spacing:.12em;color:var(--medio);margin-top:2px}
+.nav{padding:25px 14px;flex:1}
+.nav-label{font:600 10px 'JetBrains Mono';color:#9AA6AB;letter-spacing:.12em;padding:0 13px 10px}
+.nav button{width:100%;border:0;background:transparent;text-align:left;padding:11px 13px;border-radius:8px;color:#68767C;font-size:13px;margin-bottom:3px;display:flex;align-items:center;gap:11px}
+.nav button:hover{background:#F2F6F7;color:var(--petroleo)}
+.nav button.active{background:#EAF2F4;color:var(--petroleo);font-weight:600}
+.icon{width:17px;text-align:center;color:var(--medio);font-size:14px}
+.nav-sep{height:24px}
+.side-bottom{padding:14px;border-top:1px solid var(--linha)}
+.profile-mini{display:flex;align-items:center;gap:10px;padding:10px;border-radius:9px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#DCEBF0;color:var(--petroleo);display:grid;place-items:center;font-size:12px;font-weight:700}
+.profile-mini strong{display:block;font-size:11px;color:var(--petroleo)}
+.profile-mini span{font-size:10px;color:#8A969B}
+.main{margin-left:250px;flex:1;min-width:0}
+.topbar{height:82px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--linha);display:flex;align-items:center;justify-content:space-between;padding:0 38px;position:sticky;top:0;z-index:10}
+.breadcrumb{font:500 10px 'JetBrains Mono';color:#9AA6AB;letter-spacing:.05em;text-transform:uppercase}
+.top-actions{display:flex;gap:10px;align-items:center}
+.search-mini{border:1px solid var(--linha);background:#FAFBFB;border-radius:7px;padding:9px 12px;color:#89969B;font-size:11px;min-width:190px}
+.content{padding:38px;max-width:1450px;margin:auto}
+.page{display:none}.page.active{display:block;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px;gap:20px}
+.kicker{font:600 10px 'JetBrains Mono';letter-spacing:.12em;text-transform:uppercase;color:var(--medio);margin-bottom:8px}
+h1{font-size:30px;line-height:1.15;color:var(--petroleo);letter-spacing:-.025em}
+.lead{font-size:13px;color:var(--acinzentado);margin-top:8px;line-height:1.6}
+.btn{border:1px solid transparent;border-radius:6px;padding:10px 16px;font-size:12px;font-weight:600}
+.primary{background:var(--petroleo);color:white}.primary:hover{background:#245D78}
+.secondary{background:#fff;border-color:var(--cinza);color:var(--petroleo)}
+.card{background:#fff;border:1px solid var(--linha);border-radius:10px}
+.grid{display:grid;gap:14px}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat{padding:18px 20px}.stat .num{font-size:25px;color:var(--petroleo);font-weight:600}.stat span{font-size:10px;color:#87949A}
+.section-title{font-size:13px;color:var(--petroleo);font-weight:600;margin-bottom:12px}
+.project-card{padding:20px;position:relative;transition:.18s}.project-card:hover{border-color:#B9CDD4;transform:translateY(-1px)}
+.project-top{display:flex;justify-content:space-between;gap:10px}.project-name{font-size:15px;font-weight:600;color:var(--petroleo)}
+.muted{font-size:11px;color:#849096;line-height:1.6}.mono{font-family:'JetBrains Mono'}
+.status{font-size:9px;font-weight:600;padding:5px 8px;border-radius:99px;background:#EEF7F3;color:var(--verde);height:max-content}
+.status.wait{background:#FFF5E7;color:var(--amarelo)}
+.status.closed{background:#EEF0F1;color:#69757A}
+.project-meta{display:grid;grid-template-columns:repeat(3,1fr);margin:20px 0 16px;border-top:1px solid var(--linha);border-bottom:1px solid var(--linha);padding:11px 0}
+.project-meta div{font-size:10px;color:#89959A}.project-meta b{display:block;color:var(--petroleo);font-size:12px;margin-top:2px}
+.card-link{background:none;border:0;color:var(--medio);font-size:11px;font-weight:600}
+.activity{padding:18px 20px}
+.timeline{position:relative;padding-left:22px}.timeline:before{content:'';position:absolute;left:5px;top:5px;bottom:5px;width:1px;background:#D9E3E6}
+.event{position:relative;padding:0 0 20px}.event:last-child{padding-bottom:0}
+.event:before{content:'';position:absolute;left:-20px;top:5px;width:8px;height:8px;border-radius:50%;background:var(--medio);box-shadow:0 0 0 4px #EAF2F4}
+.event strong{font-size:11px;color:var(--petroleo)}.event p{font-size:11px;color:#69777D;margin-top:3px}.event time{font:9px 'JetBrains Mono';color:#A0AAAE}
+.change{display:grid;grid-template-columns:1fr 30px 1fr;align-items:center;gap:10px;margin-top:12px}
+.change-box{border:1px solid var(--linha);border-radius:7px;padding:10px;background:#FBFCFC}.change-box small{font-size:9px;color:#9AA4A8;display:block}.change-box b{font-size:11px;color:var(--petroleo)}.arrow{color:var(--medio);text-align:center}
+.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:11px}.table th{text-align:left;font:600 9px 'JetBrains Mono';text-transform:uppercase;color:#8A969B;letter-spacing:.05em;padding:12px 14px;border-bottom:1px solid var(--linha);white-space:nowrap}.table td{padding:14px;border-bottom:1px solid #EEF1F2;color:#526168}.table td strong{color:var(--petroleo);font-weight:600}.table tr:last-child td{border-bottom:0}
+.filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}.filter{border:1px solid var(--linha);background:#fff;border-radius:6px;padding:9px 11px;color:#738086;font-size:10px}.input{border:1px solid var(--cinza);background:#fff;border-radius:6px;padding:10px 12px;outline:0;color:var(--grafite);font-size:11px}.input:focus{border-color:var(--medio)}
+.project-hero{padding:24px;margin-bottom:15px}.project-hero-row{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.tabs{display:flex;gap:3px;border-bottom:1px solid var(--linha);margin-top:20px}.tab{border:0;background:transparent;padding:11px 15px;color:#7B888E;font-size:11px;border-bottom:2px solid transparent}.tab.active{color:var(--petroleo);font-weight:600;border-color:var(--medio)}
+.back{border:0;background:transparent;color:var(--medio);font-size:11px;margin-bottom:14px}
+.project-panel{display:none}.project-panel.active{display:block;animation:in .2s}
+.spec-list{display:grid;gap:9px}.spec-row{display:grid;grid-template-columns:1.1fr .8fr 1.2fr .9fr .6fr;align-items:center;padding:14px 16px;border:1px solid var(--linha);background:#fff;border-radius:8px}.spec-row.head{background:#F1F5F6;border-radius:7px;border:0;font:600 9px 'JetBrains Mono';text-transform:uppercase;color:#8A969B}.spec-row div{font-size:11px;color:#627078}.spec-row strong{color:var(--petroleo);font-weight:600}.tag-current{font-size:9px;background:#EDF7F3;color:var(--verde);padding:4px 7px;border-radius:99px;width:max-content}
+.decision{padding:17px;display:flex;justify-content:space-between;gap:20px;align-items:center}.decision-title{font-size:12px;font-weight:600;color:var(--petroleo)}.decision-meta{font-size:10px;color:#839096;margin-top:4px}.decision-actions{display:flex;gap:7px}
+.notice{padding:15px 17px;background:#EEF5F7;border-left:3px solid var(--medio);border-radius:6px;color:#53666E;font-size:11px;line-height:1.6;margin-bottom:14px}
+.version{display:flex;justify-content:space-between;align-items:center;padding:17px;border-bottom:1px solid var(--linha)}.version:last-child{border-bottom:0}.version b{font-size:12px;color:var(--petroleo)}.version span{font-size:10px;color:#89959A}
+.catalog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.product{padding:18px}.product-code{font:500 9px 'JetBrains Mono';color:var(--medio);letter-spacing:.08em}.product h3{font-size:14px;color:var(--petroleo);margin:8px 0 3px}.product p{font-size:10px;color:#7B888E;line-height:1.5}.specs-mini{display:flex;gap:6px;flex-wrap:wrap;margin-top:13px}.specs-mini span{font-size:9px;background:#F0F4F5;padding:5px 7px;border-radius:4px;color:#627078}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.form-card{padding:22px}.form-group{margin-bottom:16px}.form-group label{display:block;font-size:10px;color:#7E8B91;margin-bottom:6px}.form-group .input{width:100%}
+.empty-search{display:none;padding:30px;text-align:center;color:#87949A;font-size:11px}
+.toast{position:fixed;right:25px;bottom:25px;background:var(--petroleo);color:white;padding:12px 16px;border-radius:7px;font-size:11px;box-shadow:0 12px 35px rgba(24,72,95,.22);opacity:0;pointer-events:none;transform:translateY(10px);transition:.25s;z-index:100}.toast.show{opacity:1;transform:none}
+.login{position:fixed;inset:0;background:#F5F8F8;display:flex;align-items:center;justify-content:center;z-index:200}
+.login-grid{position:absolute;inset:0;background-image:linear-gradient(#C5D0D4 1px,transparent 1px),linear-gradient(90deg,#C5D0D4 1px,transparent 1px);background-size:70px 70px;opacity:.09}
+.login-box{position:relative;width:min(440px,calc(100% - 40px));background:white;border:1px solid var(--linha);border-radius:12px;padding:42px;box-shadow:0 25px 70px rgba(24,72,95,.10)}
+.login-mark{font-weight:700;color:var(--petroleo);font-size:24px}.login-mark small{display:block;font:500 9px 'JetBrains Mono';color:var(--medio);letter-spacing:.12em;margin-top:2px}
+.login h1{font-size:26px;margin-top:34px}.login p{font-size:11px;color:#77858B;line-height:1.65;margin:8px 0 25px}.login .input{width:100%;height:44px;margin-bottom:11px}.login .primary{width:100%;height:44px;margin-top:7px}.login-note{text-align:center;font-size:9px!important;color:#A0AAAE!important;margin:17px 0 0!important}
+@media(max-width:1000px){.sidebar{width:210px}.main{margin-left:210px}.stats{grid-template-columns:repeat(2,1fr)}.catalog-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.sidebar{position:fixed;width:72px}.brand{padding:25px 16px;font-size:0}.brand:before{content:'H';font-size:21px}.brand small{display:none}.nav-label,.nav button span:not(.icon),.profile-mini div:not(.avatar){display:none}.nav button{justify-content:center;padding:12px}.side-bottom{padding:10px}.profile-mini{justify-content:center}.main{margin-left:72px}.topbar{padding:0 18px}.search-mini{display:none}.content{padding:22px}.page-head{align-items:flex-start;flex-direction:column}.g3,.g2,.profile-grid,.catalog-grid{grid-template-columns:1fr}.spec-row{grid-template-columns:1fr 1fr;gap:7px}.spec-row.head{display:none}}
+</style>
+</head>
+<body>
+
+<div id="login" class="login">
+  <div class="login-grid"></div>
+  <div class="login-box">
+    <div class="login-mark">HEFESTOS<small>PLATAFORMA ARQUITETO</small></div>
+    <h1>Entrar na Hefestos</h1>
+    <p>Acesse seus projetos, alterações, decisões e memoriais em um único ambiente.</p>
+    <input id="email" class="input" type="email" placeholder="E-mail" autocomplete="off">
+    <input id="password" class="input" type="password" placeholder="Senha" autocomplete="off">
+    <button class="btn primary" onclick="login()">Acessar plataforma</button>
+    <p class="login-note">Ambiente demonstrativo · Hefestos V40</p>
+  </div>
+</div>
+
+<div class="app">
+<aside class="sidebar">
+  <div class="brand">HEFESTOS<small>PLATAFORMA ARQUITETO</small></div>
+  <nav class="nav">
+    <div class="nav-label">PLATAFORMA</div>
+    <button data-page="inicio" class="active" onclick="go('inicio')"><span class="icon">⌂</span><span>Início</span></button>
+    <button data-page="projetos" onclick="go('projetos')"><span class="icon">□</span><span>Projetos</span></button>
+    <button data-page="decisoes" onclick="go('decisoes')"><span class="icon">◇</span><span>Decisões</span></button>
+    <button data-page="alteracoes" onclick="go('alteracoes')"><span class="icon">↗</span><span>Alterações</span></button>
+    <button data-page="memoriais" onclick="go('memoriais')"><span class="icon">▤</span><span>Memoriais</span></button>
+    <div class="nav-sep"></div>
+    <div class="nav-label">RECURSOS</div>
+    <button data-page="catalogo" onclick="go('catalogo')"><span class="icon">⌕</span><span>Catálogo técnico</span></button>
+    <button data-page="perfil" onclick="go('perfil')"><span class="icon">○</span><span>Perfil</span></button>
+  </nav>
+  <div class="side-bottom"><button class="nav" style="border:0;background:transparent;width:100%;padding:0" onclick="logout()"><span class="icon">←</span><span>Sair</span></button>
+    <div class="profile-mini"><div class="avatar">MA</div><div><strong>Marina Almeida</strong><span>Arquiteta</span></div></div>
+  </div>
+</aside>
+
+<main class="main">
+<header class="topbar"><div class="breadcrumb" id="crumb">PLATAFORMA / INÍCIO</div><div class="top-actions"><input id="globalSearch" class="search-mini" placeholder="Buscar projetos..." oninput="searchProjects(this.value)"><button class="btn secondary" onclick="toast('Nenhuma nova notificação.')">Notificações</button></div></header>
+<div class="content">
+
+<section id="page-inicio" class="page active">
+  <div class="page-head"><div><div class="kicker">Visão geral</div><h1>Seus projetos, em controle.</h1><p class="lead">Acompanhe especificações, alterações e decisões sem perder o histórico do que foi definido.</p></div><button class="btn primary" onclick="go('projetos');toast('Área de projetos aberta.')">+ Novo projeto</button></div>
+  <div class="stats">
+    <div class="card stat"><span>PROJETOS ATIVOS</span><div class="num">3</div></div>
+    <div class="card stat"><span>ESPECIFICAÇÕES</span><div class="num">42</div></div>
+    <div class="card stat"><span>ALTERAÇÕES</span><div class="num">17</div></div>
+    <div class="card stat"><span>DECISÕES PENDENTES</span><div class="num">3</div></div>
+  </div>
+  <div class="grid g2">
+    <div><div class="section-title">Projetos recentes</div><div class="grid">
+      <div class="card project-card"><div class="project-top"><div><div class="project-name">Residência Almeida</div><div class="muted">Residencial · Reforma</div></div><span class="status">Em andamento</span></div><div class="project-meta"><div>Especificações<b>18</b></div><div>Alterações<b>7</b></div><div>Atualizado<b>Hoje, 09:42</b></div></div><button class="card-link" onclick="openProject('Residência Almeida')">Abrir projeto →</button></div>
+      <div class="card project-card"><div class="project-top"><div><div class="project-name">Apartamento Pinheiros</div><div class="muted">Residencial · Interiores</div></div><span class="status wait">Aprovações</span></div><div class="project-meta"><div>Especificações<b>15</b></div><div>Alterações<b>5</b></div><div>Atualizado<b>Ontem, 16:18</b></div></div><button class="card-link" onclick="openProject('Apartamento Pinheiros')">Abrir projeto →</button></div>
+    </div></div>
+    <div><div class="section-title">Atividade recente</div><div class="card activity"><div class="timeline">
+      <div class="event"><time>HOJE · 09:42</time><strong>Piso da cozinha alterado</strong><p>Residência Almeida · Cement Gray → Urban</p></div>
+      <div class="event"><time>HOJE · 08:17</time><strong>Memorial atualizado</strong><p>Residência Almeida · versão 7</p></div>
+      <div class="event"><time>ONTEM · 16:18</time><strong>Decisão enviada para aprovação</strong><p>Apartamento Pinheiros · Revestimento da suíte</p></div>
+      <div class="event"><time>11 SET · 14:32</time><strong>Cor do piso ajustada</strong><p>Residência Almeida · Sala de estar</p></div>
+    </div></div></div>
+  </div>
+</section>
+
+<section id="page-projetos" class="page">
+  <div class="page-head"><div><div class="kicker">Plataforma</div><h1>Projetos</h1><p class="lead">Todos os projetos e o estado atual das suas informações.</p></div><button class="btn primary" onclick="toast('Protótipo: criação de projeto iniciada.')">+ Novo projeto</button></div>
+  <div class="filters"><input class="input" id="projectSearch" placeholder="Pesquisar projeto..." oninput="searchProjects(this.value)"><button class="filter" onclick="filterStatus('all')">Todos</button><button class="filter" onclick="filterStatus('active')">Em andamento</button><button class="filter" onclick="filterStatus('wait')">Aprovações</button></div>
+  <div id="projectGrid" class="grid g3">
+    <div class="card project-card project-item" data-status="active" data-name="residência almeida"><div class="project-top"><div><div class="project-name">Residência Almeida</div><div class="muted">Residencial · Reforma</div></div><span class="status">Em andamento</span></div><div class="project-meta"><div>Itens<b>18</b></div><div>Alterações<b>7</b></div><div>Pendências<b>1</b></div></div><div class="muted">Última atualização: Hoje, 09:42</div><br><button class="card-link" onclick="openProject('Residência Almeida')">Abrir projeto →</button></div>
+    <div class="card project-card project-item" data-status="wait" data-name="apartamento pinheiros"><div class="project-top"><div><div class="project-name">Apartamento Pinheiros</div><div class="muted">Residencial · Interiores</div></div><span class="status wait">Aprovações</span></div><div class="project-meta"><div>Itens<b>15</b></div><div>Alterações<b>5</b></div><div>Pendências<b>2</b></div></div><div class="muted">Última atualização: Ontem, 16:18</div><br><button class="card-link" onclick="openProject('Apartamento Pinheiros')">Abrir projeto →</button></div>
+    <div class="card project-card project-item" data-status="active" data-name="casa jardim"><div class="project-top"><div><div class="project-name">Casa Jardim</div><div class="muted">Residencial · Projeto completo</div></div><span class="status">Em andamento</span></div><div class="project-meta"><div>Itens<b>9</b></div><div>Alterações<b>5</b></div><div>Pendências<b>0</b></div></div><div class="muted">Última atualização: 10 set, 11:06</div><br><button class="card-link" onclick="openProject('Casa Jardim')">Abrir projeto →</button></div>
+  </div>
+</section>
+
+<section id="page-decisoes" class="page">
+  <div class="page-head"><div><div class="kicker">Acompanhamento</div><h1>Decisões</h1><p class="lead">Acompanhe o que precisa ser definido e o que já foi aprovado.</p></div></div>
+  <div class="notice"><strong>3 decisões aguardam resposta.</strong> As decisões ficam associadas ao projeto para preservar o contexto em que foram tomadas.</div>
+  <div class="grid">
+    <div class="card decision"><div><div class="decision-title">Revestimento da suíte</div><div class="decision-meta">Apartamento Pinheiros · Enviado ontem, 16:18 · Envolvido: Cliente</div></div><div class="decision-actions"><button class="btn secondary" onclick="toast('Decisão aberta para análise.')">Ver contexto</button><button class="btn primary" onclick="approve(this)">Registrar aprovação</button></div></div>
+    <div class="card decision"><div><div class="decision-title">Bancada da cozinha</div><div class="decision-meta">Residência Almeida · Enviado hoje, 08:50 · Envolvido: Cliente</div></div><div class="decision-actions"><button class="btn secondary" onclick="toast('Decisão aberta para análise.')">Ver contexto</button><button class="btn primary" onclick="approve(this)">Registrar aprovação</button></div></div>
+    <div class="card decision"><div><div class="decision-title">Iluminação do escritório</div><div class="decision-meta">Casa Jardim · Enviado 10 set, 11:06 · Envolvido: Cliente</div></div><div class="decision-actions"><button class="btn secondary" onclick="toast('Decisão aberta para análise.')">Ver contexto</button><button class="btn primary" onclick="approve(this)">Registrar aprovação</button></div></div>
+  </div>
+  <br><div class="section-title">Decisões aprovadas</div>
+  <div class="card decision"><div><div class="decision-title">Piso da sala de estar</div><div class="decision-meta">Residência Almeida · Aprovado em 11 set · Participantes: Marina Almeida + Cliente</div></div><span class="status">Aprovada</span></div>
+</section>
+
+<section id="page-alteracoes" class="page">
+  <div class="page-head"><div><div class="kicker">Rastreabilidade</div><h1>Alterações</h1><p class="lead">Consulte o que mudou, quando mudou e qual era a especificação anterior.</p></div></div>
+  <div class="card table-wrap"><table class="table"><thead><tr><th>Projeto</th><th>Ambiente</th><th>Item</th><th>Antes</th><th>Depois</th><th>Data</th><th>Responsável</th></tr></thead><tbody>
+  <tr><td><strong>Residência Almeida</strong></td><td>Cozinha</td><td>Piso</td><td>Cement Gray</td><td><strong>Urban</strong></td><td>Hoje · 09:42</td><td>Marina Almeida</td></tr>
+  <tr><td><strong>Residência Almeida</strong></td><td>Sala de estar</td><td>Piso</td><td>Off White</td><td><strong>Gray</strong></td><td>11 set · 14:32</td><td>Marina Almeida</td></tr>
+  <tr><td><strong>Apartamento Pinheiros</strong></td><td>Suíte</td><td>Revestimento</td><td>Urban Beige</td><td><strong>Urban Gray</strong></td><td>10 set · 16:18</td><td>Marina Almeida</td></tr>
+  <tr><td><strong>Casa Jardim</strong></td><td>Banheiro</td><td>Bancada</td><td>Branco Paraná</td><td><strong>Aura</strong></td><td>10 set · 11:06</td><td>Marina Almeida</td></tr>
+  </tbody></table></div>
+</section>
+
+<section id="page-memoriais" class="page">
+  <div class="page-head"><div><div class="kicker">Documentação</div><h1>Memoriais</h1><p class="lead">Versões atuais e anteriores dos memoriais dos seus projetos.</p></div></div>
+  <div class="grid">
+    <div class="card"><div class="version"><div><b>Residência Almeida</b><span>18 itens · Atualizado hoje, 09:42</span></div><div><strong style="color:var(--petroleo);font-size:12px">v.7</strong> <button class="btn primary" onclick="exportMemorial('Residência Almeida')">Exportar memorial</button></div></div><div class="version"><div><b>v.6</b><span>11 set · 14:32</span></div><button class="card-link" onclick="toast('Visualizando versão 6.')">Ver versão</button></div><div class="version"><div><b>v.5</b><span>08 set · 10:20</span></div><button class="card-link" onclick="toast('Visualizando versão 5.')">Ver versão</button></div></div>
+    <div class="card"><div class="version"><div><b>Apartamento Pinheiros</b><span>15 itens · Atualizado ontem, 16:18</span></div><div><strong style="color:var(--petroleo);font-size:12px">v.4</strong> <button class="btn primary" onclick="exportMemorial('Apartamento Pinheiros')">Exportar memorial</button></div></div><div class="version"><div><b>v.3</b><span>09 set · 13:08</span></div><button class="card-link" onclick="toast('Visualizando versão 3.')">Ver versão</button></div></div>
+  </div>
+</section>
+
+<section id="page-catalogo" class="page">
+  <div class="page-head"><div><div class="kicker">Recurso técnico</div><h1>Catálogo técnico</h1><p class="lead">Consulte informações técnicas para apoiar suas especificações.</p></div></div>
+  <div class="filters"><input id="catalogSearch" class="input" style="min-width:280px" placeholder="Pesquisar produto, marca ou categoria..." oninput="searchCatalog(this.value)"><button class="filter">Todos</button><button class="filter">Pisos</button><button class="filter">Revestimentos</button><button class="filter">Bancadas</button></div>
+  <div id="catalogGrid" class="catalog-grid">
+    <div class="card product product-item" data-name="cement gray portobello piso"><span class="product-code">PISO · PORTOBELLO</span><h3>Cement Gray</h3><p>Porcelanato · Acabamento natural · Uso residencial.</p><div class="specs-mini"><span>60×60 cm</span><span>Natural</span><span>Interno</span></div></div>
+    <div class="card product product-item" data-name="urban portobello piso"><span class="product-code">PISO · PORTOBELLO</span><h3>Urban</h3><p>Porcelanato · Acabamento natural · Áreas internas.</p><div class="specs-mini"><span>90×90 cm</span><span>Natural</span><span>Interno</span></div></div>
+    <div class="card product product-item" data-name="urban gray decortiles revestimento"><span class="product-code">REVESTIMENTO · DECORTILES</span><h3>Urban Gray</h3><p>Revestimento cerâmico · Superfície fosca · Uso interno.</p><div class="specs-mini"><span>60×120 cm</span><span>Fosco</span><span>Parede</span></div></div>
+    <div class="card product product-item" data-name="aura dekton bancada"><span class="product-code">BANCADA · DEKTON</span><h3>Aura</h3><p>Superfície ultracompacta · Alta resistência · Aplicações internas.</p><div class="specs-mini"><span>Superfície</span><span>Alta resistência</span></div></div>
+    <div class="card product product-item" data-name="branco paraná bancada"><span class="product-code">BANCADA · MÁRMORE</span><h3>Branco Paraná</h3><p>Pedra natural · Acabamento polido · Uso em bancadas.</p><div class="specs-mini"><span>Natural</span><span>Polido</span></div></div>
+    <div class="card product product-item" data-name="off white piso"><span class="product-code">PISO · MULTIMARCAS</span><h3>Off White</h3><p>Porcelanato · Tom claro · Aplicações residenciais.</p><div class="specs-mini"><span>90×90 cm</span><span>Interno</span></div></div>
+  </div>
+</section>
+
+<section id="page-perfil" class="page">
+  <div class="page-head"><div><div class="kicker">Conta</div><h1>Perfil</h1><p class="lead">Dados da arquiteta e preferências da plataforma.</p></div><button class="btn primary" onclick="toast('Preferências salvas.')">Salvar alterações</button></div>
+  <div class="profile-grid">
+    <div class="card form-card"><div class="section-title">Informações profissionais</div>
+      <div class="form-group"><label>NOME</label><input class="input" value="Marina Almeida"></div>
+      <div class="form-group"><label>E-MAIL</label><input class="input" value="marina@exemplo.com"></div>
+      <div class="form-group"><label>REGISTRO PROFISSIONAL</label><input class="input" value="CAU A123456-7"></div>
+    </div>
+    <div class="card form-card"><div class="section-title">Preferências</div>
+      <div class="form-group"><label>NOTIFICAÇÕES</label><button class="filter" onclick="toast('Preferência de notificações alternada.')">Alterações e decisões · Ativas</button></div>
+      <div class="form-group"><label>VISUALIZAÇÃO</label><button class="filter">Informações detalhadas</button></div>
+      <div class="notice" style="margin-top:10px">As preferências controlam como as informações dos seus projetos aparecem na plataforma.</div>
+    </div>
+  </div>
+</section>
+
+<section id="page-projeto" class="page">
+  <button class="back" onclick="go('projetos')">← Voltar para projetos</button>
+  <div class="card project-hero"><div class="project-hero-row"><div><div class="kicker">Projeto</div><h1 id="projectTitle">Residência Almeida</h1><p class="lead">Residencial · Reforma · Última atualização hoje, 09:42</p></div><span class="status">Em andamento</span></div>
+    <div class="tabs"><button class="tab active" data-panel="overview" onclick="projectTab('overview',this)">Visão geral</button><button class="tab" data-panel="specs" onclick="projectTab('specs',this)">Especificações</button><button class="tab" data-panel="history" onclick="projectTab('history',this)">Histórico</button><button class="tab" data-panel="decisions" onclick="projectTab('decisions',this)">Decisões</button></div>
+  </div>
+  <div id="panel-overview" class="project-panel active">
+    <div class="stats"><div class="card stat"><span>ESPECIFICAÇÕES</span><div class="num">18</div></div><div class="card stat"><span>ALTERAÇÕES</span><div class="num">7</div></div><div class="card stat"><span>PENDÊNCIAS</span><div class="num">1</div></div><div class="card stat"><span>MEMORIAL</span><div class="num">v.7</div></div></div>
+    <div class="grid g2"><div class="card activity"><div class="section-title">Atividade recente</div><div class="timeline"><div class="event"><time>HOJE · 09:42</time><strong>Piso da cozinha alterado</strong><p>Cement Gray → Urban</p></div><div class="event"><time>HOJE · 08:17</time><strong>Memorial atualizado</strong><p>Nova versão v.7 criada</p></div><div class="event"><time>11 SET · 14:32</time><strong>Cor do piso ajustada</strong><p>Off White → Gray</p></div></div></div><div><div class="section-title">Decisão pendente</div><div class="card decision"><div><div class="decision-title">Bancada da cozinha</div><div class="decision-meta">Aguardando aprovação do cliente.</div></div><button class="btn secondary" onclick="toast('Contexto da decisão aberto.')">Ver</button></div></div></div>
+  </div>
+  <div id="panel-specs" class="project-panel"><div class="notice">As especificações são organizadas por <strong>ambiente e item</strong>. Cada alteração pode gerar um novo registro no histórico sem apagar a informação anterior.</div><div class="spec-list"><div class="spec-row head"><div>Ambiente</div><div>Item</div><div>Produto</div><div>Fabricante</div><div>Status</div></div>
+    <div class="spec-row"><div><strong>Sala de estar</strong></div><div>Piso</div><div>Cement Gray</div><div>Portobello</div><div><span class="tag-current">Atual</span></div></div>
+    <div class="spec-row"><div><strong>Cozinha</strong></div><div>Piso</div><div>Urban</div><div>Portobello</div><div><span class="tag-current">Atual</span></div></div>
+    <div class="spec-row"><div><strong>Cozinha</strong></div><div>Bancada</div><div>Aura</div><div>Dekton</div><div><span class="tag-current">Atual</span></div></div>
+    <div class="spec-row"><div><strong>Suíte</strong></div><div>Revestimento</div><div>Urban Gray</div><div>Decortiles</div><div><span class="tag-current">Atual</span></div></div>
+    <div class="spec-row"><div><strong>Banheiro</strong></div><div>Piso</div><div>Off White</div><div>Portobello</div><div><span class="tag-current">Atual</span></div></div>
+  </div></div>
+  <div id="panel-history" class="project-panel"><div class="card activity"><div class="section-title">Linha do tempo do projeto</div><div class="timeline"><div class="event"><time>HOJE · 09:42</time><strong>Piso da cozinha alterado</strong><p>Antes: Cement Gray · Depois: Urban · Responsável: Marina Almeida</p></div><div class="event"><time>HOJE · 08:17</time><strong>Memorial atualizado</strong><p>Versão anterior: v.6 · Nova versão: v.7</p></div><div class="event"><time>11 SET · 14:32</time><strong>Cor do piso da sala ajustada</strong><p>Antes: Off White · Depois: Gray · Responsável: Marina Almeida</p></div><div class="event"><time>08 SET · 10:20</time><strong>Especificação criada</strong><p>Piso da sala de estar · Cement Gray · Portobello</p></div></div></div></div>
+  <div id="panel-decisions" class="project-panel"><div class="grid"><div class="card decision"><div><div class="decision-title">Bancada da cozinha</div><div class="decision-meta">Aguardando aprovação · Cliente · Ontem, 16:18</div></div><button class="btn primary" onclick="approve(this)">Registrar aprovação</button></div><div class="card decision"><div><div class="decision-title">Piso da sala de estar</div><div class="decision-meta">Aprovada · 11 set · Marina Almeida + Cliente</div></div><span class="status">Aprovada</span></div></div></div>
+</section>
+
+</div></main></div>
+<div id="toast" class="toast"></div>
+
+<script>
+let currentPage='inicio';
+const labels={inicio:'INÍCIO',projetos:'PROJETOS',decisoes:'DECISÕES',alteracoes:'ALTERAÇÕES',memoriais:'MEMORIAIS',catalogo:'CATÁLOGO TÉCNICO',perfil:'PERFIL',projeto:'PROJETO'};
+function login(){
+  const e=document.getElementById('email').value.trim(), p=document.getElementById('password').value;
+  if(!e||!p){toast('Preencha e-mail e senha para acessar.');return}
+  document.getElementById('login').style.display='none';
+  sessionStorage.setItem('hefestosLogged','1');
+  toast('Acesso realizado. Bem-vinda à Hefestos.');
+}
+function logout(){
+  sessionStorage.removeItem('hefestosLogged');
+  document.getElementById('login').style.display='flex';
+  document.getElementById('email').value='';document.getElementById('password').value='';
+  go('inicio');
+}
+function go(page){
+  currentPage=page;
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav button[data-page]').forEach(x=>x.classList.toggle('active',x.dataset.page===page));
+  document.getElementById('crumb').textContent='PLATAFORMA / '+labels[page];
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function openProject(name){
+  document.getElementById('projectTitle').textContent=name;
+  go('projeto');
+  projectTab('overview',document.querySelector('.tab[data-panel="overview"]'));
+}
+function projectTab(panel,el){
+  document.querySelectorAll('.project-panel').forEach(x=>x.classList.remove('active'));
+  document.getElementById('panel-'+panel).classList.add('active');
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+}
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(window._toast);window._toast=setTimeout(()=>t.classList.remove('show'),2600);
+}
+function searchProjects(v){
+  const val=v.toLowerCase().trim();
+  document.querySelectorAll('.project-item').forEach(x=>x.style.display=(!val||x.dataset.name.includes(val))?'block':'none');
+  const ps=document.getElementById('projectSearch');if(ps&&document.activeElement.id==='globalSearch')ps.value=v;
+}
+function filterStatus(status){
+  document.querySelectorAll('.project-item').forEach(x=>x.style.display=(status==='all'||x.dataset.status===status)?'block':'none');
+}
+function searchCatalog(v){
+  const val=v.toLowerCase().trim();
+  document.querySelectorAll('.product-item').forEach(x=>x.style.display=(!val||x.dataset.name.includes(val))?'block':'none');
+}
+function approve(btn){
+  const box=btn.closest('.decision'); if(!box)return;
+  const status=box.querySelector('.status');
+  if(status){status.textContent='Aprovada';status.className='status';}
+  btn.remove();
+  toast('Aprovação registrada no histórico do projeto.');
+}
+function exportMemorial(name){
+  const content=`HEFESTOS — MEMORIAL DESCRITIVO\\nProjeto: ${name}\\nVersão: 7\\nAtualizado: 17/09/2026\\n\\nAMBIENTE | ITEM | PRODUTO | FABRICANTE\\nSala de estar | Piso | Cement Gray | Portobello\\nCozinha | Piso | Urban | Portobello\\nCozinha | Bancada | Aura | Dekton\\nSuíte | Revestimento | Urban Gray | Decortiles`;
+  const blob=new Blob([content],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='memorial-'+name.toLowerCase().replaceAll(' ','-')+'.txt';a.click();URL.revokeObjectURL(a.href);toast('Memorial exportado com sucesso.');
+}
+if(sessionStorage.getItem('hefestosLogged')==='1')document.getElementById('login').style.display='none';
+</script>
+</body>
+</html>
