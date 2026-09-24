@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hefestos V40 — Plataforma Arquiteto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --petroleo:#18485F; --medio:#387798; --grafite:#272727; --acinzentado:#64727A;
+  --cinza:#D8E0E3; --linha:#E7ECEE; --fundo:#F6F8F8; --branco:#fff;
+  --verde:#2E8B68; --amarelo:#B9822B; --vermelho:#B94B4B;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Poppins,sans-serif;background:var(--fundo);color:var(--grafite);min-height:100vh}
+button,input{font:inherit} button{cursor:pointer}
+.app{display:flex;min-height:100vh}
+.sidebar{width:250px;background:#fff;border-right:1px solid var(--linha);position:fixed;inset:0 auto 0 0;z-index:20;display:flex;flex-direction:column}
+.brand{height:82px;padding:25px 27px;border-bottom:1px solid var(--linha);font-weight:700;color:var(--petroleo);font-size:21px;letter-spacing:-.03em}
+.brand small{display:block;font:500 9px 'JetBrains Mono';letter-spacing:.12em;color:var(--medio);margin-top:2px}
+.nav{padding:25px 14px;flex:1}
+.nav-label{font:600 10px 'JetBrains Mono';color:#9AA6AB;letter-spacing:.12em;padding:0 13px 10px}
+.nav button{width:100%;border:0;background:transparent;text-align:left;padding:11px 13px;border-radius:8px;color:#68767C;font-size:13px;margin-bottom:3px;display:flex;align-items:center;gap:11px}
+.nav button:hover{background:#F2F6F7;color:var(--petroleo)}
+.nav button.active{background:#EAF2F4;color:var(--petroleo);font-weight:600}
+.icon{width:17px;text-align:center;color:var(--medio);font-size:14px}
+.nav-sep{height:24px}
+.side-bottom{padding:14px;border-top:1px solid var(--linha)}
+.profile-mini{display:flex;align-items:center;gap:10px;padding:10px;border-radius:9px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#DCEBF0;color:var(--petroleo);display:grid;place-items:center;font-size:12px;font-weight:700}
+.profile-mini strong{display:block;font-size:11px;color:var(--petroleo)}
+.profile-mini span{font-size:10px;color:#8A969B}
+.main{margin-left:250px;flex:1;min-width:0}
+.topbar{height:82px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--linha);display:flex;align-items:center;justify-content:space-between;padding:0 38px;position:sticky;top:0;z-index:10}
+.breadcrumb{font:500 10px 'JetBrains Mono';color:#9AA6AB;letter-spacing:.05em;text-transform:uppercase}
+.top-actions{display:flex;gap:10px;align-items:center}
+.search-mini{border:1px solid var(--linha);background:#FAFBFB;border-radius:7px;padding:9px 12px;color:#89969B;font-size:11px;min-width:190px}
+.content{padding:38px;max-width:1450px;margin:auto}
+.page{display:none}.page.active{display:block;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px;gap:20px}
+.kicker{font:600 10px 'JetBrains Mono';letter-spacing:.12em;text-transform:uppercase;color:var(--medio);margin-bottom:8px}
+h1{font-size:30px;line-height:1.15;color:var(--petroleo);letter-spacing:-.025em}
+.lead{font-size:13px;color:var(--acinzentado);margin-top:8px;line-height:1.6}
+.btn{border:1px solid transparent;border-radius:6px;padding:10px 16px;font-size:12px;font-weight:600}
+.primary{background:var(--petroleo);color:white}.primary:hover{background:#245D78}
+.secondary{background:#fff;border-color:var(--cinza);color:var(--petroleo)}
+.card{background:#fff;border:1px solid var(--linha);border-radius:10px}
+.grid{display:grid;gap:14px}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat{padding:18px 20px}.stat .num{font-size:25px;color:var(--petroleo);font-weight:600}.stat span{font-size:10px;color:#87949A}
+.section-title{font-size:13px;color:var(--petroleo);font-weight:600;margin-bottom:12px}
+.project-card{padding:20px;position:relative;transition:.18s}.project-card:hover{border-color:#B9CDD4;transform:translateY(-1px)}
+.project-top{display:flex;justify-content:space-between;gap:10px}.project-name{font-size:15px;font-weight:600;color:var(--petroleo)}
+.muted{font-size:11px;color:#849096;line-height:1.6}.mono{font-family:'JetBrains Mono'}
+.status{font-size:9px;font-weight:600;padding:5px 8px;border-radius:99px;background:#EEF7F3;color:var(--verde);height:max-content}
+.status.wait{background:#FFF5E7;color:var(--amarelo)}
+.status.closed{background:#EEF0F1;color:#69757A}
+.project-meta{display:grid;grid-template-columns:repeat(3,1fr);margin:20px 0 16px;border-top:1px solid var(--linha);border-bottom:1px solid var(--linha);padding:11px 0}
+.project-meta div{font-size:10px;color:#89959A}.project-meta b{display:block;color:var(--petroleo);font-size:12px;margin-top:2px}
+.card-link{background:none;border:0;color:var(--medio);font-size:11px;font-weight:600}
+.activity{padding:18px 20px}
+.timeline{position:relative;padding-left:22px}.timeline:before{content:'';position:absolute;left:5px;top:5px;bottom:5px;width:1px;background:#D9E3E6}
+.event{position:relative;padding:0 0 20px}.event:last-child{padding-bottom:0}
+.event:before{content:'';position:absolute;left:-20px;top:5px;width:8px;height:8px;border-radius:50%;background:var(--medio);box-shadow:0 0 0 4px #EAF2F4}
+.event strong{font-size:11px;color:var(--petroleo)}.event p{font-size:11px;color:#69777D;margin-top:3px}.event time{font:9px 'JetBrains Mono';color:#A0AAAE}
+.change{display:grid;grid-template-columns:1fr 30px 1fr;align-items:center;gap:10px;margin-top:12px}
+.change-box{border:1px solid var(--linha);border-radius:7px;padding:10px;background:#FBFCFC}.change-box small{font-size:9px;color:#9AA4A8;display:block}.change-box b{font-size:11px;color:var(--petroleo)}.arrow{color:var(--medio);text-align:center}
+.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:11px}.table th{text-align:left;font:600 9px 'JetBrains Mono';text-transform:uppercase;color:#8A969B;letter-spacing:.05em;padding:12px 14px;border-bottom:1px solid var(--linha);white-space:nowrap}.table td{padding:14px;border-bottom:1px solid #EEF1F2;color:#526168}.table td strong{color:var(--petroleo);font-weight:600}.table tr:last-child td{border-bottom:0}
+.filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}.filter{border:1px solid var(--linha);background:#fff;border-radius:6px;padding:9px 11px;color:#738086;font-size:10px}.input{border:1px solid var(--cinza);background:#fff;border-radius:6px;padding:10px 12px;outline:0;color:var(--grafite);font-size:11px}.input:focus{border-color:var(--medio)}
+.project-hero{padding:24px;margin-bottom:15px}.project-hero-row{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.tabs{display:flex;gap:3px;border-bottom:1px solid var(--linha);margin-top:20px}.tab{border:0;background:transparent;padding:11px 15px;color:#7B888E;font-size:11px;border-bottom:2px solid transparent}.tab.active{color:var(--petroleo);font-weight:600;border-color:var(--medio)}
+.back{border:0;background:transparent;color:var(--medio);font-size:11px;margin-bottom:14px}
+.project-panel{display:none}.project-panel.active{display:block;animation:in .2s}
+.spec-list{display:grid;gap:9px}.spec-row{display:grid;grid-template-columns:1.1fr .8fr 1.2fr .9fr .6fr;align-items:center;padding:14px 16px;border:1px solid var(--linha);background:#fff;border-radius:8px}.spec-row.head{background:#F1F5F6;border-radius:7px;border:0;font:600 9px 'JetBrains Mono';text-transform:uppercase;color:#8A969B}.spec-row div{font-size:11px;color:#627078}.spec-row strong{color:var(--petroleo);font-weight:600}.tag-current{font-size:9px;background:#EDF7F3;color:var(--verde);padding:4px 7px;border-radius:99px;width:max-content}
+.decision{padding:17px;display:flex;justify-content:space-between;gap:20px;align-items:center}.decision-title{font-size:12px;font-weight:600;color:var(--petroleo)}.decision-meta{font-size:10px;color:#839096;margin-top:4px}.decision-actions{display:flex;gap:7px}
+.notice{padding:15px 17px;background:#EEF5F7;border-left:3px solid var(--medio);border-radius:6px;color:#53666E;font-size:11px;line-height:1.6;margin-bottom:14px}
+.version{display:flex;justify-content:space-between;align-items:center;padding:17px;border-bottom:1px solid var(--linha)}.version:last-child{border-bottom:0}.version b{font-size:12px;color:var(--petroleo)}.version span{font-size:10px;color:#89959A}
+.catalog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.product{padding:18px}.product-code{font:500 9px 'JetBrains Mono';color:var(--medio);letter-spacing:.08em}.product h3{font-size:14px;color:var(--petroleo);margin:8px 0 3px}.product p{font-size:10px;color:#7B888E;line-height:1.5}.specs-mini{display:flex;gap:6px;flex-wrap:wrap;margin-top:13px}.specs-mini span{font-size:9px;background:#F0F4F5;padding:5px 7px;border-radius:4px;color:#627078}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.form-card{padding:22px}.form-group{margin-bottom:16px}.form-group label{display:block;font-size:10px;color:#7E8B91;margin-bottom:6px}.form-group .input{width:100%}
+.empty-search{display:none;padding:30px;text-align:center;color:#87949A;font-size:11px}
+.toast{position:fixed;right:25px;bottom:25px;background:var(--petroleo);color:white;padding:12px 16px;border-radius:7px;font-size:11px;box-shadow:0 12px 35px rgba(24,72,95,.22);opacity:0;pointer-events:none;transform:translateY(10px);transition:.25s;z-index:100}.toast.show{opacity:1;transform:none}
+.login{display:none;position:fixed;inset:0;background:#F5F8F8;display:flex;align-items:center;justify-content:center;z-index:200}
+.login-grid{position:absolute;inset:0;background-image:linear-gradient(#C5D0D4 1px,transparent 1px),linear-gradient(90deg,#C5D0D4 1px,transparent 1px);background-size:70px 70px;opacity:.09}
+.login-box{position:relative;width:min(440px,calc(100% - 40px));background:white;border:1px solid var(--linha);border-radius:12px;padding:42px;box-shadow:0 25px 70px rgba(24,72,95,.10)}
+.login-mark{font-weight:700;color:var(--petroleo);font-size:24px}.login-mark small{display:block;font:500 9px 'JetBrains Mono';color:var(--medio);letter-spacing:.12em;margin-top:2px}
+.login h1{font-size:26px;margin-top:34px}.login p{font-size:11px;color:#77858B;line-height:1.65;margin:8px 0 25px}.login .input{width:100%;height:44px;margin-bottom:11px}.login .primary{width:100%;height:44px;margin-top:7px}.login-note{text-align:center;font-size:9px!important;color:#A0AAAE!important;margin:17px 0 0!important}
+@media(max-width:1000px){.sidebar{width:210px}.main{margin-left:210px}.stats{grid-template-columns:repeat(2,1fr)}.catalog-grid{grid-template-columns:repeat(2,1fr)}}
+
+.hf-land-pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.price-card{background:#fff;border:1px solid #D8E0E3;border-radius:12px;padding:28px 24px;position:relative;display:flex;flex-direction:column;gap:14px}
+.price-card.featured{border-color:#18485F;box-shadow:0 16px 40px rgba(24,72,95,.14)}
+.price-card h3{font-size:17px;color:#18485F;font-weight:700}
+.price-card .price{font-size:27px;font-weight:700;color:#18485F}
+.price-card .price span{font-size:12px;font-weight:500;color:#64727A}
+.price-card ul{list-style:none;font-size:12.5px;color:#4A5C6A;line-height:2.1;flex:1}
+.price-card ul li:before{content:"✓ ";color:#2E8B68;font-weight:700}
+.price-tag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#18485F;color:#fff;font-size:9px;font-weight:700;padding:5px 12px;border-radius:99px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+@media(max-width:800px){.hf-land-pricing{grid-template-columns:1fr}}
+.nav button.locked{opacity:.4}
+.nav button.locked .icon:after{content:'🔒';font-size:9px;margin-left:3px}
+.notif-wrap{position:relative}
+.notif-badge{background:var(--vermelho);color:#fff;font-size:9px;font-weight:700;border-radius:99px;padding:1px 6px;margin-left:6px}
+.notif-panel{display:none;position:absolute;right:0;top:calc(100% + 8px);width:300px;background:#fff;border:1px solid var(--linha);border-radius:10px;box-shadow:0 18px 45px rgba(24,72,95,.16);z-index:40;padding:8px}
+.notif-panel.show{display:block}
+.notif-item{padding:10px 12px;border-radius:7px}
+.notif-item:hover{background:#F2F6F7}
+.notif-item strong{display:block;font-size:11px;color:var(--petroleo)}
+.notif-item p{font-size:10.5px;color:#69777D;margin-top:2px}
+.notif-item time{font:9px 'JetBrains Mono';color:#A0AAAE}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(24,72,95,.35);z-index:80;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{width:min(420px,calc(100% - 40px))}
+@media(max-width:760px){.sidebar{position:fixed;width:72px}.brand{padding:25px 16px;font-size:0}.brand:before{content:'H';font-size:21px}.brand small{display:none}.nav-label,.nav button span:not(.icon),.profile-mini div:not(.avatar){display:none}.nav button{justify-content:center;padding:12px}.side-bottom{padding:10px}.profile-mini{justify-content:center}.main{margin-left:72px}.topbar{padding:0 18px}.search-mini{display:none}.content{padding:22px}.page-head{align-items:flex-start;flex-direction:column}.g3,.g2,.profile-grid,.catalog-grid{grid-template-columns:1fr}.spec-row{grid-template-columns:1fr 1fr;gap:7px}.spec-row.head{display:none}}
+</style>
+</head>
+<body>
+<style>
+/* HEFESTOS — LANDING V40 */
+#landing{
+  position:fixed;inset:0;z-index:150;overflow-y:auto;background:#F8FAFA;
+  color:#272727;font-family:Poppins,sans-serif;
+}
+#landing *{box-sizing:border-box}
+.hf-landing-wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+.hf-land-header{position:sticky;top:0;z-index:5;background:rgba(248,250,250,.88);backdrop-filter:blur(14px);border-bottom:1px solid rgba(174,179,183,.42)}
+.hf-land-nav{height:76px;display:flex;align-items:center;justify-content:space-between}
+.hf-land-logo img{height:29px;width:auto;display:block}
+.hf-land-links{display:flex;align-items:center;gap:28px}
+.hf-land-links a,.hf-land-links button{font:500 13px Poppins,sans-serif;color:#4A5C6A;text-decoration:none;background:none;border:0;cursor:pointer}
+.hf-land-links a:hover,.hf-land-links button:hover{color:#18485F}
+.hf-land-cta{background:#18485F!important;color:#fff!important;padding:10px 17px;border-radius:7px;font-weight:600!important}
+.hf-land-hero{position:relative;min-height:calc(100vh - 76px);display:flex;align-items:center;padding:72px 0 80px;overflow:hidden}
+.hf-land-gridbg{position:absolute;inset:0;background-image:linear-gradient(#AEB3B7 1px,transparent 1px),linear-gradient(90deg,#AEB3B7 1px,transparent 1px);background-size:64px 64px;opacity:.075;pointer-events:none}
+.hf-land-hero-content{position:relative;max-width:930px}
+.hf-land-eyebrow{font:600 11px 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#387798;display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.hf-land-eyebrow:before{content:"";width:26px;height:1px;background:#387798}
+.hf-land-hero h1{font-size:clamp(42px,6.2vw,76px);line-height:1.04;letter-spacing:-.035em;color:#18485F;max-width:900px}
+.hf-land-hero h1 span{color:#272727}
+.hf-land-hero p{max-width:690px;margin-top:25px;font-size:17px;line-height:1.7;color:#64727A}
+.hf-land-actions{display:flex;gap:12px;margin-top:34px}
+.hf-land-btn{border:1px solid transparent;border-radius:7px;padding:12px 20px;font:600 13px Poppins,sans-serif;cursor:pointer;text-decoration:none}
+.hf-land-btn.primary{background:#18485F;color:#fff}
+.hf-land-btn.primary:hover{background:#387798}
+.hf-land-btn.secondary{background:#fff;border-color:#AEB3B7;color:#18485F}
+.hf-land-btn.secondary:hover{border-color:#387798}
+.hf-land-flow{position:relative;margin-top:76px;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px dashed #AEB3B7;padding-top:25px}
+.hf-land-step{position:relative;text-align:center}
+.hf-land-dot{margin:-46px auto 14px;width:42px;height:42px;border-radius:50%;background:#F8FAFA;border:1.5px solid #AEB3B7;display:grid;place-items:center;font:500 11px 'JetBrains Mono';color:#387798}
+.hf-land-step strong{display:block;font-size:12px;color:#18485F}
+.hf-land-step span{display:block;font-size:10px;color:#64727A;margin-top:4px}
+.hf-land-section{padding:100px 0}
+.hf-land-section.dark{background:#18485F;color:#fff}
+.hf-land-section.light{background:#EEF3F5}
+.hf-land-tag{font:600 10px 'JetBrains Mono';letter-spacing:.14em;text-transform:uppercase;color:#387798;margin-bottom:14px}
+.hf-land-section.dark .hf-land-tag{color:#8EB5C6}
+.hf-land-title{font-size:clamp(28px,4vw,42px);line-height:1.16;letter-spacing:-.025em;color:#18485F;max-width:720px}
+.hf-land-section.dark .hf-land-title{color:#fff}
+.hf-land-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:45px}
+.hf-land-card{background:#fff;border:1px solid #D8E0E3;border-radius:11px;padding:23px;min-height:150px;transition:.2s}
+.hf-land-section.dark .hf-land-card{background:rgba(255,255,255,.045);border-color:rgba(216,224,227,.18)}
+.hf-land-card:hover{transform:translateY(-2px);border-color:#387798}
+.hf-land-card b{display:block;color:#18485F;font-size:14px;margin-bottom:8px}
+.hf-land-section.dark .hf-land-card b{color:#fff}
+.hf-land-card span{font-size:12px;line-height:1.6;color:#64727A}
+.hf-land-section.dark .hf-land-card span{color:#C8D5DA}
+.hf-land-solution{display:grid;grid-template-columns:.7fr 1.3fr;gap:65px;align-items:start}
+.hf-land-solution h2{font-size:clamp(30px,4vw,48px);line-height:1.08;color:#18485F}
+.hf-land-copy{font-size:16px;line-height:1.75;color:#64727A}
+.hf-land-points{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:26px}
+.hf-land-point{background:#fff;border:1px solid #D8E0E3;border-radius:9px;padding:17px}
+.hf-land-point b{display:block;color:#18485F;font-size:13px;margin-bottom:5px}
+.hf-land-point span{font-size:11px;line-height:1.5;color:#64727A}
+.hf-land-footer{background:#272727;color:#D8E0E3;padding:50px 0 28px}
+.hf-land-footer-row{display:flex;justify-content:space-between;gap:25px;align-items:end}
+.hf-land-footer h3{font-size:24px;color:#fff;max-width:520px}
+.hf-land-footer p{font-size:11px;color:#AEB3B7;margin-top:8px}
+.hf-land-footer-bottom{margin-top:35px;padding-top:18px;border-top:1px solid rgba(216,224,227,.15);font-size:10px;color:#AEB3B7}
+@media(max-width:800px){
+ .hf-land-links a:not(.hf-land-cta),.hf-land-links button{display:none}
+ .hf-land-wrap{padding:0 20px}.hf-land-hero{padding:60px 0}
+ .hf-land-flow{grid-template-columns:1fr 1fr;gap:30px;border-top:0}
+ .hf-land-dot{margin:0 auto 10px}.hf-land-grid{grid-template-columns:1fr}
+ .hf-land-solution{grid-template-columns:1fr;gap:25px}.hf-land-points{grid-template-columns:1fr}
+ .hf-land-footer-row{flex-direction:column;align-items:flex-start}
+}
+
+/* V40 — refinamento visual da plataforma */
+.sidebar{width:258px;box-shadow:8px 0 28px rgba(24,72,95,.035)}
+.brand{height:78px;padding:23px 27px}
+.nav{padding:22px 14px}.nav button{border-radius:9px;padding:12px 13px}
+.nav button.active{box-shadow:inset 3px 0 0 var(--medio)}
+.topbar{height:78px;padding:0 40px}
+.content{padding:40px;max-width:1500px}
+.card{border-radius:12px;box-shadow:0 3px 16px rgba(24,72,95,.035)}
+.project-card:hover{box-shadow:0 10px 26px rgba(24,72,95,.08)}
+.btn{border-radius:8px;padding:10px 17px}
+.primary{box-shadow:0 5px 14px rgba(24,72,95,.12)}
+.stat{padding:20px 21px}
+.stat .num{font-size:27px}
+.section-title{font-size:13px}
+.project-hero{box-shadow:0 5px 20px rgba(24,72,95,.045)}
+.filters .input{border-radius:8px}.filter{border-radius:8px}
+.tabs{gap:6px}.tab{padding:12px 16px;border-radius:7px 7px 0 0}
+.spec-row{border-radius:9px}.product{border-radius:11px}
+</style>
+
+<div id="landing">
+<header class="hf-land-header">
+  <nav class="hf-landing-wrap hf-land-nav">
+    <a class="hf-land-logo" href="#topo"><img src="data:image/png;base64,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" alt="Hefestos"></a>
+    <div class="hf-land-links">
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#problema-land">O problema</a>
+      <a href="#solucao-land">A solução</a>
+      <a href="#planos-land">Planos</a>
+      <a href="#sobre-land">Sobre a Hefestos</a>
+      <button class="hf-land-cta" onclick="openAccess()">Acessar plataforma</button>
+    </div>
+  </nav>
+</header>
+<main id="topo">
+<section class="hf-land-hero">
+  <div class="hf-land-gridbg"></div>
+  <div class="hf-landing-wrap">
+    <div class="hf-land-hero-content">
+      <div class="hf-land-eyebrow">plataforma b2b · para arquitetos</div>
+      <h1>Mais clareza para <span>as decisões do projeto.</span></h1>
+      <p>A Hefestos centraliza especificações, decisões, alterações e aprovações dos projetos arquitetônicos em um único ambiente, mantendo o histórico do que foi definido.</p>
+      <div class="hf-land-actions">
+        <button class="hf-land-btn primary" onclick="openAccess()">Acessar plataforma</button>
+        <a class="hf-land-btn secondary" href="#como-funciona">Como funciona</a>
+      </div>
+    </div>
+    <div class="hf-land-flow" id="como-funciona">
+      <div class="hf-land-step"><div class="hf-land-dot">01</div><strong>Informações</strong><span>Reunir dados do projeto</span></div>
+      <div class="hf-land-step"><div class="hf-land-dot">02</div><strong>Especificações</strong><span>Organizar por ambiente e item</span></div>
+      <div class="hf-land-step"><div class="hf-land-dot">03</div><strong>Decisões</strong><span>Registrar aprovações</span></div>
+      <div class="hf-land-step"><div class="hf-land-dot">04</div><strong>Alterações</strong><span>Preservar o histórico</span></div>
+      <div class="hf-land-step"><div class="hf-land-dot">05</div><strong>Memorial</strong><span>Gerar a versão atual</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="hf-land-section dark" id="problema-land">
+  <div class="hf-landing-wrap">
+    <div class="hf-land-tag">O problema</div>
+    <h2 class="hf-land-title">Informações importantes do projeto ficam espalhadas e difíceis de rastrear.</h2>
+    <div class="hf-land-grid">
+      <div class="hf-land-card"><b>Informações dispersas</b><span>Especificações, mensagens, arquivos e decisões ficam distribuídos em diferentes canais e versões.</span></div>
+      <div class="hf-land-card"><b>Mudanças sem contexto</b><span>Quando um item muda, pode ser difícil identificar o que foi alterado e qual decisão levou à mudança.</span></div>
+      <div class="hf-land-card"><b>Aprovações difíceis de acompanhar</b><span>Registros informais podem dificultar a consulta posterior do que foi aprovado e por quem.</span></div>
+      <div class="hf-land-card"><b>Histórico fragmentado</b><span>Versões anteriores podem se perder quando novas informações substituem as anteriores.</span></div>
+      <div class="hf-land-card"><b>Memorial desatualizado</b><span>Alterações feitas ao longo do projeto exigem atualização e conferência antes da emissão.</span></div>
+      <div class="hf-land-card"><b>Tempo gasto procurando</b><span>O arquiteto precisa recuperar informações antes de conseguir tomar ou comunicar uma decisão.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="hf-land-section" id="solucao-land">
+  <div class="hf-landing-wrap">
+    <div class="hf-land-tag">A solução</div>
+    <div class="hf-land-solution">
+      <h2>Uma única linha do tempo para entender o projeto.</h2>
+      <div class="hf-land-copy">
+        A Hefestos organiza as informações do projeto em registros conectados. Cada especificação pode ser acompanhada por suas alterações, decisões e aprovações, permitindo consultar o estado atual sem perder o histórico.
+        <div class="hf-land-points">
+          <div class="hf-land-point"><b>Especificações por item</b><span>Materiais organizados por ambiente, item, produto e fabricante.</span></div>
+          <div class="hf-land-point"><b>Histórico de alterações</b><span>Consulte o que mudou, quando mudou e qual era a informação anterior.</span></div>
+          <div class="hf-land-point"><b>Decisões e aprovações</b><span>Registre o contexto e acompanhe o andamento de cada decisão.</span></div>
+          <div class="hf-land-point"><b>Memoriais versionados</b><span>Mantenha versões anteriores e exporte o memorial mais recente.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hf-land-section" id="planos-land">
+  <div class="hf-landing-wrap">
+    <div class="hf-land-tag">Planos</div>
+    <h2 class="hf-land-title">Escolha o plano do seu momento.</h2>
+    <div class="hf-land-pricing">
+      <div class="price-card">
+        <h3>Alicerce</h3>
+        <div class="price">R$ 39,90<span>/mês</span></div>
+        <ul>
+          <li>Organização por projeto</li>
+          <li>Especificações por ambiente e item</li>
+          <li>Histórico básico de alteração</li>
+        </ul>
+        <button class="hf-land-btn secondary" onclick="selectPlan('alicerce')">Escolher Alicerce</button>
+      </div>
+      <div class="price-card featured">
+        <div class="price-tag">Mais escolhido</div>
+        <h3>Estrutura</h3>
+        <div class="price">R$ 69,90<span>/mês</span></div>
+        <ul>
+          <li>Histórico completo de alteração</li>
+          <li>Registro de decisões e aprovações</li>
+          <li>Notificações de mudança</li>
+        </ul>
+        <button class="hf-land-btn primary" onclick="selectPlan('estrutura')">Escolher Estrutura</button>
+      </div>
+      <div class="price-card">
+        <h3>Hefesto</h3>
+        <div class="price">R$ 99,90<span>/mês</span></div>
+        <ul>
+          <li>Projetos ilimitados</li>
+          <li>Memorial atualizado</li>
+          <li>Compartilhamento e aprovação de informação</li>
+        </ul>
+        <button class="hf-land-btn secondary" onclick="selectPlan('hefesto')">Escolher Hefesto</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hf-land-section light" id="sobre-land">
+  <div class="hf-landing-wrap">
+    <div class="hf-land-solution">
+      <div><div class="hf-land-tag">Sobre a Hefestos</div><h2>Feita para a rotina de quem projeta.</h2></div>
+      <div class="hf-land-copy">
+        A Hefestos é uma plataforma digital B2B voltada exclusivamente para arquitetos. Seu objetivo é tornar a gestão das informações dos projetos mais organizada, clara e rastreável, conectando especificações, decisões, alterações e documentação em um único ambiente.
+        <div class="hf-land-points">
+          <div class="hf-land-point"><b>Organização</b><span>Informações reunidas em uma estrutura única.</span></div>
+          <div class="hf-land-point"><b>Rastreabilidade</b><span>Histórico das mudanças e decisões do projeto.</span></div>
+          <div class="hf-land-point"><b>Clareza</b><span>Estado atual e contexto acessíveis em poucos passos.</span></div>
+          <div class="hf-land-point"><b>Continuidade</b><span>O histórico permanece mesmo quando o projeto evolui.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="hf-land-footer">
+  <div class="hf-landing-wrap">
+    <div class="hf-land-footer-row">
+      <div><h3>Organize o projeto. Preserve o histórico.</h3><p>Hefestos · Plataforma B2B para arquitetos</p></div>
+      <button class="hf-land-btn primary" onclick="openAccess()">Acessar plataforma</button>
+    </div>
+    <div class="hf-land-footer-bottom">© 2026 Hefestos. Protótipo de plataforma.</div>
+  </div>
+</footer>
+</main>
+</div>
+
+
+<div id="login" class="login">
+  <div class="login-grid"></div>
+  <div class="login-box">
+    <div class="login-mark">HEFESTOS<small>PLATAFORMA ARQUITETO</small></div>
+    <h1>Entrar na Hefestos</h1>
+    <p>Acesse seus projetos, alterações, decisões e memoriais em um único ambiente.</p>
+    <input id="email" class="input" type="email" placeholder="E-mail" autocomplete="off">
+    <input id="password" class="input" type="password" placeholder="Senha" autocomplete="off">
+    <button class="btn primary" onclick="login()">Acessar plataforma</button>
+    <p class="login-note">Ambiente demonstrativo · Hefestos V40</p>
+  </div>
+</div>
+
+<div class="app">
+<aside class="sidebar">
+  <div class="brand">HEFESTOS<small>PLATAFORMA ARQUITETO</small></div>
+  <nav class="nav">
+    <div class="nav-label">PLATAFORMA</div>
+    <button data-page="inicio" class="active" onclick="go('inicio')"><span class="icon">⌂</span><span>Início</span></button>
+    <button data-page="projetos" onclick="go('projetos')"><span class="icon">□</span><span>Projetos</span></button>
+    <button data-page="decisoes" onclick="go('decisoes')"><span class="icon">◇</span><span>Decisões</span></button>
+    <button data-page="alteracoes" onclick="go('alteracoes')"><span class="icon">↗</span><span>Alterações</span></button>
+    <button data-page="memoriais" onclick="go('memoriais')"><span class="icon">▤</span><span>Memoriais</span></button>
+    <div class="nav-sep"></div>
+    <div class="nav-label">RECURSOS</div>
+    <button data-page="catalogo" onclick="go('catalogo')"><span class="icon">⌕</span><span>Catálogo técnico</span></button>
+    <button data-page="perfil" onclick="go('perfil')"><span class="icon">○</span><span>Perfil</span></button>
+  </nav>
+  <div class="side-bottom"><button class="nav" style="border:0;background:transparent;width:100%;padding:0" onclick="logout()"><span class="icon">←</span><span>Sair</span></button>
+    <div class="profile-mini"><div class="avatar">MA</div><div><strong>Marina Almeida</strong><span>Arquiteta · <span id="planBadge">Estrutura</span></span></div></div>
+  </div>
+</aside>
+
+<main class="main">
+<header class="topbar"><div class="breadcrumb" id="crumb">PLATAFORMA / INÍCIO</div><div class="top-actions"><input id="globalSearch" class="search-mini" placeholder="Buscar projetos..." oninput="searchProjects(this.value)"><div class="notif-wrap"><button class="btn secondary" onclick="toggleNotifications()">Notificações<span id="notifBadge" class="notif-badge" style="display:none"></span></button>
+  <div id="notifPanel" class="notif-panel"></div></div></div></header>
+<div class="content">
+
+<section id="page-inicio" class="page active">
+  <div class="page-head"><div><div class="kicker">Visão geral</div><h1>Seus projetos, em controle.</h1><p class="lead">Acompanhe especificações, alterações e decisões sem perder o histórico do que foi definido.</p></div><button class="btn primary" onclick="go('projetos');openNewProject()">+ Novo projeto</button></div>
+  <div class="stats">
+    <div class="card stat"><span>PROJETOS ATIVOS</span><div class="num">3</div></div>
+    <div class="card stat"><span>ESPECIFICAÇÕES</span><div class="num">42</div></div>
+    <div class="card stat"><span>ALTERAÇÕES</span><div class="num">17</div></div>
+    <div class="card stat"><span>DECISÕES PENDENTES</span><div class="num">3</div></div>
+  </div>
+  <div class="grid g2">
+    <div><div class="section-title">Projetos recentes</div><div class="grid">
+      <div class="card project-card"><div class="project-top"><div><div class="project-name">Residência Almeida</div><div class="muted">Residencial · Reforma</div></div><span class="status">Em andamento</span></div><div class="project-meta"><div>Especificações<b>18</b></div><div>Alterações<b>7</b></div><div>Atualizado<b>Hoje, 09:42</b></div></div><button class="card-link" onclick="openProject('Residência Almeida')">Abrir projeto →</button></div>
+      <div class="card project-card"><div class="project-top"><div><div class="project-name">Apartamento Pinheiros</div><div class="muted">Residencial · Interiores</div></div><span class="status wait">Aprovações</span></div><div class="project-meta"><div>Especificações<b>15</b></div><div>Alterações<b>5</b></div><div>Atualizado<b>Ontem, 16:18</b></div></div><button class="card-link" onclick="openProject('Apartamento Pinheiros')">Abrir projeto →</button></div>
+    </div></div>
+    <div><div class="section-title">Atividade recente</div><div class="card activity"><div class="timeline">
+      <div class="event"><time>HOJE · 09:42</time><strong>Piso da cozinha alterado</strong><p>Residência Almeida · Cement Gray → Urban</p></div>
+      <div class="event"><time>HOJE · 08:17</time><strong>Memorial atualizado</strong><p>Residência Almeida · versão 7</p></div>
+      <div class="event"><time>ONTEM · 16:18</time><strong>Decisão enviada para aprovação</strong><p>Apartamento Pinheiros · Revestimento da suíte</p></div>
+      <div class="event"><time>11 SET · 14:32</time><strong>Cor do piso ajustada</strong><p>Residência Almeida · Sala de estar</p></div>
+    </div></div></div>
+  </div>
+</section>
+
+<section id="page-projetos" class="page">
+  <div class="page-head"><div><div class="kicker">Plataforma</div><h1>Projetos</h1><p class="lead">Todos os projetos e o estado atual das suas informações.</p></div><button class="btn primary" onclick="openNewProject()">+ Novo projeto</button></div>
+  <div class="filters"><input class="input" id="projectSearch" placeholder="Pesquisar projeto..." oninput="searchProjects(this.value)"><button class="filter" onclick="filterStatus('all')">Todos</button><button class="filter" onclick="filterStatus('active')">Em andamento</button><button class="filter" onclick="filterStatus('wait')">Aprovações</button></div>
+  <div id="projectGrid" class="grid g3">
+    <div class="card project-card project-item" data-status="active" data-name="residência almeida"><div class="project-top"><div><div class="project-name">Residência Almeida</div><div class="muted">Residencial · Reforma</div></div><span class="status">Em andamento</span></div><div class="project-meta"><div>Itens<b>18</b></div><div>Alterações<b>7</b></div><div>Pendências<b>1</b></div></div><div class="muted">Última atualização: Hoje, 09:42</div><br><button class="card-link" onclick="openProject('Residência Almeida')">Abrir projeto →</button></div>
+    <div class="card project-card project-item" data-status="wait" data-name="apartamento pinheiros"><div class="project-top"><div><div class="project-name">Apartamento Pinheiros</div><div class="muted">Residencial · Interiores</div></div><span class="status wait">Aprovações</span></div><div class="project-meta"><div>Itens<b>15</b></div><div>Alterações<b>5</b></div><div>Pendências<b>2</b></div></div><div class="muted">Última atualização: Ontem, 16:18</div><br><button class="card-link" onclick="openProject('Apartamento Pinheiros')">Abrir projeto →</button></div>
+    <div class="card project-card project-item" data-status="active" data-name="casa jardim"><div class="project-top"><div><div class="project-name">Casa Jardim</div><div class="muted">Residencial · Projeto completo</div></div><span class="status">Em andamento</span></div><div class="project-meta"><div>Itens<b>9</b></div><div>Alterações<b>5</b></div><div>Pendências<b>0</b></div></div><div class="muted">Última atualização: 10 set, 11:06</div><br><button class="card-link" onclick="openProject('Casa Jardim')">Abrir projeto →</button></div>
+  </div>
+</section>
+
+<section id="page-decisoes" class="page">
+  <div class="page-head"><div><div class="kicker">Acompanhamento</div><h1>Decisões</h1><p class="lead">Acompanhe o que precisa ser definido e o que já foi aprovado.</p></div></div>
+  <div id="decisoes-lock" style="display:none" class="notice"><strong>Registro de decisões e aprovações é um recurso do plano Estrutura.</strong> Faça upgrade para acompanhar aprovações direto na plataforma.</div>
+  <div id="decisoes-content">
+  <div class="notice"><strong>3 decisões aguardam resposta.</strong> As decisões ficam associadas ao projeto para preservar o contexto em que foram tomadas.</div>
+  <div class="grid">
+    <div class="card decision"><div><div class="decision-title">Revestimento da suíte</div><div class="decision-meta">Apartamento Pinheiros · Enviado ontem, 16:18 · Envolvido: Cliente</div></div><div class="decision-actions"><button class="btn secondary" onclick="toast('Decisão aberta para análise.')">Ver contexto</button><button class="btn primary" onclick="approve(this)">Registrar aprovação</button></div></div>
+    <div class="card decision"><div><div class="decision-title">Bancada da cozinha</div><div class="decision-meta">Residência Almeida · Enviado hoje, 08:50 · Envolvido: Cliente</div></div><div class="decision-actions"><button class="btn secondary" onclick="toast('Decisão aberta para análise.')">Ver contexto</button><button class="btn primary" onclick="approve(this)">Registrar aprovação</button></div></div>
+    <div class="card decision"><div><div class="decision-title">Iluminação do escritório</div><div class="decision-meta">Casa Jardim · Enviado 10 set, 11:06 · Envolvido: Cliente</div></div><div class="decision-actions"><button class="btn secondary" onclick="toast('Decisão aberta para análise.')">Ver contexto</button><button class="btn primary" onclick="approve(this)">Registrar aprovação</button></div></div>
+  </div>
+  <br><div class="section-title">Decisões aprovadas</div>
+  <div class="card decision"><div><div class="decision-title">Piso da sala de estar</div><div class="decision-meta">Residência Almeida · Aprovado em 11 set · Participantes: Marina Almeida + Cliente</div></div><span class="status">Aprovada</span></div>
+  </div>
+</section>
+
+<section id="page-alteracoes" class="page">
+  <div class="page-head"><div><div class="kicker">Rastreabilidade</div><h1>Alterações</h1><p class="lead">Consulte o que mudou, quando mudou e qual era a especificação anterior.</p></div></div>
+  <div class="card table-wrap"><table class="table"><thead><tr><th>Projeto</th><th>Ambiente</th><th>Item</th><th>Antes</th><th>Depois</th><th>Data</th><th>Responsável</th></tr></thead><tbody>
+  <tr><td><strong>Residência Almeida</strong></td><td>Cozinha</td><td>Piso</td><td>Cement Gray</td><td><strong>Urban</strong></td><td>Hoje · 09:42</td><td>Marina Almeida</td></tr>
+  <tr><td><strong>Residência Almeida</strong></td><td>Sala de estar</td><td>Piso</td><td>Off White</td><td><strong>Gray</strong></td><td>11 set · 14:32</td><td>Marina Almeida</td></tr>
+  <tr><td><strong>Apartamento Pinheiros</strong></td><td>Suíte</td><td>Revestimento</td><td>Urban Beige</td><td><strong>Urban Gray</strong></td><td>10 set · 16:18</td><td>Marina Almeida</td></tr>
+  <tr><td><strong>Casa Jardim</strong></td><td>Banheiro</td><td>Bancada</td><td>Branco Paraná</td><td><strong>Aura</strong></td><td>10 set · 11:06</td><td>Marina Almeida</td></tr>
+  </tbody></table></div>
+</section>
+
+<section id="page-memoriais" class="page">
+  <div class="page-head"><div><div class="kicker">Documentação</div><h1>Memoriais</h1><p class="lead">Versões atuais e anteriores dos memoriais dos seus projetos.</p></div></div>
+  <div class="grid">
+    <div class="card"><div class="version"><div><b>Residência Almeida</b><span>18 itens · Atualizado hoje, 09:42</span></div><div><strong style="color:var(--petroleo);font-size:12px">v.7</strong> <button class="btn primary" onclick="exportMemorial('Residência Almeida')">Exportar memorial</button></div></div><div class="version"><div><b>v.6</b><span>11 set · 14:32</span></div><button class="card-link" onclick="toast('Visualizando versão 6.')">Ver versão</button></div><div class="version"><div><b>v.5</b><span>08 set · 10:20</span></div><button class="card-link" onclick="toast('Visualizando versão 5.')">Ver versão</button></div></div>
+    <div class="card"><div class="version"><div><b>Apartamento Pinheiros</b><span>15 itens · Atualizado ontem, 16:18</span></div><div><strong style="color:var(--petroleo);font-size:12px">v.4</strong> <button class="btn primary" onclick="exportMemorial('Apartamento Pinheiros')">Exportar memorial</button></div></div><div class="version"><div><b>v.3</b><span>09 set · 13:08</span></div><button class="card-link" onclick="toast('Visualizando versão 3.')">Ver versão</button></div></div>
+  </div>
+</section>
+
+<section id="page-catalogo" class="page">
+  <div class="page-head"><div><div class="kicker">Recurso técnico</div><h1>Catálogo técnico</h1><p class="lead">Consulte informações técnicas para apoiar suas especificações.</p></div></div>
+  <div class="card" style="padding:20px;margin-bottom:16px">
+    <div class="section-title">Verificar compatibilidade técnica</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <select id="compA" class="input">
+        <option value="cement gray">Cement Gray (Piso)</option>
+        <option value="urban">Urban (Piso)</option>
+        <option value="urban gray">Urban Gray (Revestimento)</option>
+        <option value="aura">Aura (Bancada)</option>
+        <option value="branco paraná">Branco Paraná (Bancada)</option>
+        <option value="off white">Off White (Piso)</option>
+      </select>
+      <span class="muted">com</span>
+      <select id="compB" class="input">
+        <option value="urban" selected>Urban (Piso)</option>
+        <option value="cement gray">Cement Gray (Piso)</option>
+        <option value="urban gray">Urban Gray (Revestimento)</option>
+        <option value="aura">Aura (Bancada)</option>
+        <option value="branco paraná">Branco Paraná (Bancada)</option>
+        <option value="off white">Off White (Piso)</option>
+      </select>
+      <button class="btn primary" onclick="checkCompat()">Verificar</button>
+    </div>
+    <div id="compResult" class="notice" style="display:none;margin-top:12px"></div>
+  </div>
+  <div class="filters"><input id="catalogSearch" class="input" style="min-width:280px" placeholder="Pesquisar produto, marca ou categoria..." oninput="searchCatalog(this.value)"><button class="filter">Todos</button><button class="filter">Pisos</button><button class="filter">Revestimentos</button><button class="filter">Bancadas</button></div>
+  <div id="catalogGrid" class="catalog-grid">
+    <div class="card product product-item" data-name="cement gray portobello piso"><span class="product-code">PISO · PORTOBELLO</span><h3>Cement Gray</h3><p>Porcelanato · Acabamento natural · Uso residencial.</p><div class="specs-mini"><span>60×60 cm</span><span>Natural</span><span>Interno</span></div></div>
+    <div class="card product product-item" data-name="urban portobello piso"><span class="product-code">PISO · PORTOBELLO</span><h3>Urban</h3><p>Porcelanato · Acabamento natural · Áreas internas.</p><div class="specs-mini"><span>90×90 cm</span><span>Natural</span><span>Interno</span></div></div>
+    <div class="card product product-item" data-name="urban gray decortiles revestimento"><span class="product-code">REVESTIMENTO · DECORTILES</span><h3>Urban Gray</h3><p>Revestimento cerâmico · Superfície fosca · Uso interno.</p><div class="specs-mini"><span>60×120 cm</span><span>Fosco</span><span>Parede</span></div></div>
+    <div class="card product product-item" data-name="aura dekton bancada"><span class="product-code">BANCADA · DEKTON</span><h3>Aura</h3><p>Superfície ultracompacta · Alta resistência · Aplicações internas.</p><div class="specs-mini"><span>Superfície</span><span>Alta resistência</span></div></div>
+    <div class="card product product-item" data-name="branco paraná bancada"><span class="product-code">BANCADA · MÁRMORE</span><h3>Branco Paraná</h3><p>Pedra natural · Acabamento polido · Uso em bancadas.</p><div class="specs-mini"><span>Natural</span><span>Polido</span></div></div>
+    <div class="card product product-item" data-name="off white piso"><span class="product-code">PISO · MULTIMARCAS</span><h3>Off White</h3><p>Porcelanato · Tom claro · Aplicações residenciais.</p><div class="specs-mini"><span>90×90 cm</span><span>Interno</span></div></div>
+  </div>
+</section>
+
+<section id="page-perfil" class="page">
+  <div class="page-head"><div><div class="kicker">Conta</div><h1>Perfil</h1><p class="lead">Dados da arquiteta e preferências da plataforma.</p></div><button class="btn primary" onclick="toast('Preferências salvas.')">Salvar alterações</button></div>
+  <div class="profile-grid">
+    <div class="card form-card"><div class="section-title">Informações profissionais</div>
+      <div class="form-group"><label>NOME</label><input class="input" value="Marina Almeida"></div>
+      <div class="form-group"><label>E-MAIL</label><input class="input" value="marina@exemplo.com"></div>
+      <div class="form-group"><label>REGISTRO PROFISSIONAL</label><input class="input" value="CAU A123456-7"></div>
+    </div>
+    <div class="card form-card"><div class="section-title">Preferências</div>
+      <div class="form-group"><label>NOTIFICAÇÕES</label><button class="filter" onclick="toast('Preferência de notificações alternada.')">Alterações e decisões · Ativas</button></div>
+      <div class="form-group"><label>VISUALIZAÇÃO</label><button class="filter">Informações detalhadas</button></div>
+      <div class="notice" style="margin-top:10px">As preferências controlam como as informações dos seus projetos aparecem na plataforma.</div>
+    </div>
+    <div class="card form-card"><div class="section-title">Plano atual</div>
+      <div class="form-group"><label>PLANO</label>
+        <select id="planSelect" class="input" onchange="changePlan(this.value)">
+          <option value="alicerce">Alicerce — R$ 39,90/mês</option>
+          <option value="estrutura">Estrutura — R$ 69,90/mês</option>
+          <option value="hefesto">Hefesto — R$ 99,90/mês</option>
+        </select>
+      </div>
+      <div class="notice">Trocar o plano aqui é só para fins de demonstração — em produção isso ficaria dentro de um fluxo de cobrança de verdade.</div>
+    </div>
+  </div>
+</section>
+
+<section id="page-projeto" class="page">
+  <button class="back" onclick="go('projetos')">← Voltar para projetos</button>
+  <div class="card project-hero"><div class="project-hero-row"><div><div class="kicker">Projeto</div><h1 id="projectTitle">Residência Almeida</h1><p class="lead">Residencial · Reforma · Última atualização hoje, 09:42</p></div><div style="display:flex;gap:8px;align-items:center"><button id="shareBtn" class="btn secondary" style="display:none" onclick="shareProject()">Compartilhar com cliente</button><span class="status">Em andamento</span></div></div>
+    <div class="tabs"><button class="tab active" data-panel="overview" onclick="projectTab('overview',this)">Visão geral</button><button class="tab" data-panel="specs" onclick="projectTab('specs',this)">Especificações</button><button class="tab" data-panel="history" onclick="projectTab('history',this)">Histórico</button><button class="tab" data-panel="decisions" onclick="projectTab('decisions',this)">Decisões</button></div>
+  </div>
+  <div id="panel-overview" class="project-panel active">
+    <div class="stats"><div class="card stat"><span>ESPECIFICAÇÕES</span><div class="num">18</div></div><div class="card stat"><span>ALTERAÇÕES</span><div class="num">7</div></div><div class="card stat"><span>PENDÊNCIAS</span><div class="num">1</div></div><div class="card stat"><span>MEMORIAL</span><div class="num">v.7</div></div></div>
+    <div class="grid g2"><div class="card activity"><div class="section-title">Atividade recente</div><div class="timeline"><div class="event"><time>HOJE · 09:42</time><strong>Piso da cozinha alterado</strong><p>Cement Gray → Urban</p></div><div class="event"><time>HOJE · 08:17</time><strong>Memorial atualizado</strong><p>Nova versão v.7 criada</p></div><div class="event"><time>11 SET · 14:32</time><strong>Cor do piso ajustada</strong><p>Off White → Gray</p></div></div></div><div><div class="section-title">Decisão pendente</div><div class="card decision"><div><div class="decision-title">Bancada da cozinha</div><div class="decision-meta">Aguardando aprovação do cliente.</div></div><button class="btn secondary" onclick="toast('Contexto da decisão aberto.')">Ver</button></div></div></div>
+  </div>
+  <div id="panel-specs" class="project-panel"><div class="notice">As especificações são organizadas por <strong>ambiente e item</strong>. Cada alteração pode gerar um novo registro no histórico sem apagar a informação anterior.</div><div class="spec-list"><div class="spec-row head"><div>Ambiente</div><div>Item</div><div>Produto</div><div>Fabricante</div><div>Status</div></div>
+    <div class="spec-row"><div><strong>Sala de estar</strong></div><div>Piso</div><div>Cement Gray</div><div>Portobello</div><div><span class="tag-current">Atual</span></div></div>
+    <div class="spec-row"><div><strong>Cozinha</strong></div><div>Piso</div><div>Urban</div><div>Portobello</div><div><span class="tag-current">Atual</span></div></div>
+    <div class="spec-row"><div><strong>Cozinha</strong></div><div>Bancada</div><div>Aura</div><div>Dekton</div><div><span class="tag-current">Atual</span></div></div>
+    <div class="spec-row"><div><strong>Suíte</strong></div><div>Revestimento</div><div>Urban Gray</div><div>Decortiles</div><div><span class="tag-current">Atual</span></div></div>
+    <div class="spec-row"><div><strong>Banheiro</strong></div><div>Piso</div><div>Off White</div><div>Portobello</div><div><span class="tag-current">Atual</span></div></div>
+  </div></div>
+  <div id="panel-history" class="project-panel"><div class="card activity"><div class="section-title">Linha do tempo do projeto</div><div class="timeline"><div class="event"><time>HOJE · 09:42</time><strong>Piso da cozinha alterado</strong><p>Antes: Cement Gray · Depois: Urban · Responsável: Marina Almeida</p></div><div class="event"><time>HOJE · 08:17</time><strong>Memorial atualizado</strong><p>Versão anterior: v.6 · Nova versão: v.7</p></div><div class="event"><time>11 SET · 14:32</time><strong>Cor do piso da sala ajustada</strong><p>Antes: Off White · Depois: Gray · Responsável: Marina Almeida</p></div><div class="event"><time>08 SET · 10:20</time><strong>Especificação criada</strong><p>Piso da sala de estar · Cement Gray · Portobello</p></div></div></div></div>
+  <div id="panel-decisions" class="project-panel"><div class="grid"><div class="card decision"><div><div class="decision-title">Bancada da cozinha</div><div class="decision-meta">Aguardando aprovação · Cliente · Ontem, 16:18</div></div><button class="btn primary" onclick="approve(this)">Registrar aprovação</button></div><div class="card decision"><div><div class="decision-title">Piso da sala de estar</div><div class="decision-meta">Aprovada · 11 set · Marina Almeida + Cliente</div></div><span class="status">Aprovada</span></div></div></div>
+</section>
+
+</div></main></div>
+<div id="newProjectModal" class="modal-overlay">
+  <div class="card form-card modal-box">
+    <div class="section-title">Novo projeto</div>
+    <div class="form-group"><label>NOME DO PROJETO</label><input id="npName" class="input" placeholder="Ex.: Casa Vila Mariana"></div>
+    <div class="form-group"><label>TIPO</label><input id="npType" class="input" placeholder="Ex.: Residencial · Reforma"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+      <button class="btn secondary" onclick="closeNewProject()">Cancelar</button>
+      <button class="btn primary" onclick="createProject()">Criar projeto</button>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+let currentPage='inicio';
+const labels={inicio:'INÍCIO',projetos:'PROJETOS',decisoes:'DECISÕES',alteracoes:'ALTERAÇÕES',memoriais:'MEMORIAIS',catalogo:'CATÁLOGO TÉCNICO',perfil:'PERFIL',projeto:'PROJETO'};
+const PLANS={
+  alicerce:{label:'Alicerce',maxProjects:1,decisions:false,notifications:false,memorialExport:false,sharing:false},
+  estrutura:{label:'Estrutura',maxProjects:5,decisions:true,notifications:true,memorialExport:false,sharing:false},
+  hefesto:{label:'Hefesto',maxProjects:Infinity,decisions:true,notifications:true,memorialExport:true,sharing:true}
+};
+let currentPlan=sessionStorage.getItem('hefestosPlan')||'estrutura';
+let projectCount=3;
+const NOTIF_ITEMS=[
+  {t:'Piso da cozinha alterado',d:'Residência Almeida · Cement Gray → Urban',time:'Hoje · 09:42'},
+  {t:'Memorial atualizado',d:'Residência Almeida · versão 7',time:'Hoje · 08:17'},
+  {t:'Decisão enviada para aprovação',d:'Apartamento Pinheiros · Revestimento da suíte',time:'Ontem · 16:18'},
+  {t:'Cor do piso ajustada',d:'Residência Almeida · Sala de estar',time:'11 set · 14:32'}
+];
+const COMPAT={
+  'aura|cement gray':'Compatível — ambas suportam uso em áreas de alta umidade e resistem a manchas.',
+  'aura|urban':'Compatível — combinação usual em cozinhas com bancada em superfície ultracompacta.',
+  'branco paraná|off white':'Compatível — tons neutros combinam esteticamente e ambos têm baixa absorção.',
+  'urban gray|urban':'Compatível — mesma linha de acabamento, indicada para uso conjunto em áreas internas.'
+};
+function selectPlan(planId){
+  sessionStorage.setItem('hefestosPlan',planId);
+  currentPlan=planId;
+  openAccess();
+}
+function renderGating(){
+  const p=PLANS[currentPlan];
+  const badge=document.getElementById('planBadge'); if(badge) badge.textContent=p.label;
+  const sel=document.getElementById('planSelect'); if(sel) sel.value=currentPlan;
+  const decBtn=document.querySelector('.nav button[data-page="decisoes"]'); if(decBtn) decBtn.classList.toggle('locked',!p.decisions);
+  const shareBtn=document.getElementById('shareBtn'); if(shareBtn) shareBtn.style.display=p.sharing?'inline-flex':'none';
+  const notifBadge=document.getElementById('notifBadge');
+  if(notifBadge) notifBadge.style.display=p.notifications?'inline-block':'none';
+  if(notifBadge && p.notifications) notifBadge.textContent=NOTIF_ITEMS.length;
+  if(currentPage==='decisoes') applyDecisoesLock();
+}
+function applyDecisoesLock(){
+  const allowed=PLANS[currentPlan].decisions;
+  const content=document.getElementById('decisoes-content'), lock=document.getElementById('decisoes-lock');
+  if(content) content.style.display=allowed?'':'none';
+  if(lock) lock.style.display=allowed?'none':'';
+}
+function changePlan(v){
+  currentPlan=v;
+  sessionStorage.setItem('hefestosPlan',v);
+  renderGating();
+  toast('Plano alterado para '+PLANS[v].label+'.');
+}
+function toggleNotifications(){
+  const p=PLANS[currentPlan];
+  if(!p.notifications){toast('Notificações disponíveis a partir do plano Estrutura.');return}
+  const panel=document.getElementById('notifPanel');
+  if(!panel.classList.contains('show')){
+    panel.innerHTML=NOTIF_ITEMS.map(n=>`<div class="notif-item"><strong>${n.t}</strong><p>${n.d}</p><time>${n.time}</time></div>`).join('');
+  }
+  panel.classList.toggle('show');
+}
+function openNewProject(){
+  const p=PLANS[currentPlan];
+  if(projectCount>=p.maxProjects){toast('Limite de projetos do plano '+p.label+' atingido. Faça upgrade para adicionar mais.');return}
+  document.getElementById('npName').value='';document.getElementById('npType').value='';
+  document.getElementById('newProjectModal').classList.add('show');
+}
+function closeNewProject(){document.getElementById('newProjectModal').classList.remove('show');}
+function createProject(){
+  const name=document.getElementById('npName').value.trim()||'Novo projeto';
+  const type=document.getElementById('npType').value.trim()||'Residencial';
+  projectCount++;
+  const card=document.createElement('div');
+  card.className='card project-card project-item';
+  card.dataset.status='active'; card.dataset.name=name.toLowerCase();
+  card.innerHTML=`<div class="project-top"><div><div class="project-name">${name}</div><div class="muted">${type}</div></div><span class="status">Em andamento</span></div><div class="project-meta"><div>Itens<b>0</b></div><div>Alterações<b>0</b></div><div>Pendências<b>0</b></div></div><div class="muted">Criado agora</div><br><button class="card-link" onclick="openProject('${name}')">Abrir projeto →</button>`;
+  const grid=document.getElementById('projectGrid');
+  if(grid) grid.prepend(card);
+  closeNewProject();
+  toast('Projeto criado.');
+}
+function checkCompat(){
+  const a=document.getElementById('compA').value, b=document.getElementById('compB').value;
+  const box=document.getElementById('compResult'); box.style.display='block';
+  if(a===b){box.textContent='Selecione dois produtos diferentes para comparar.';return}
+  const msg=COMPAT[a+'|'+b]||COMPAT[b+'|'+a]||'Sem restrições técnicas conhecidas entre esses materiais — verificação baseada no catálogo cadastrado.';
+  box.textContent=msg;
+}
+function shareProject(){
+  if(!PLANS[currentPlan].sharing){toast('Compartilhamento disponível no plano Hefesto.');return}
+  const link='hefestos.app/c/'+Math.random().toString(36).slice(2,8);
+  toast('Link de acompanhamento gerado: '+link);
+}
+function openAccess(){
+  document.getElementById('landing').style.display='none';
+  document.getElementById('login').style.display='flex';
+  window.scrollTo({top:0,behavior:'auto'});
+}
+function login(){
+  const e=document.getElementById('email').value.trim(), p=document.getElementById('password').value;
+  if(!e||!p){toast('Preencha e-mail e senha para acessar.');return}
+  document.getElementById('login').style.display='none';
+  document.getElementById('landing').style.display='none';
+  sessionStorage.setItem('hefestosLogged','1');
+  go('inicio');
+  renderGating();
+  toast('Acesso realizado. Bem-vinda à Hefestos.');
+}
+function logout(){
+  sessionStorage.removeItem('hefestosLogged');
+  document.getElementById('login').style.display='none';
+  document.getElementById('landing').style.display='block';
+  document.getElementById('email').value='';document.getElementById('password').value='';
+  go('inicio');
+  window.scrollTo({top:0,behavior:'auto'});
+}
+function go(page){
+  currentPage=page;
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav button[data-page]').forEach(x=>x.classList.toggle('active',x.dataset.page===page));
+  document.getElementById('crumb').textContent='PLATAFORMA / '+labels[page];
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(page==='decisoes') applyDecisoesLock();
+  document.getElementById('notifPanel')?.classList.remove('show');
+}
+function openProject(name){
+  document.getElementById('projectTitle').textContent=name;
+  go('projeto');
+  projectTab('overview',document.querySelector('.tab[data-panel="overview"]'));
+}
+function projectTab(panel,el){
+  document.querySelectorAll('.project-panel').forEach(x=>x.classList.remove('active'));
+  document.getElementById('panel-'+panel).classList.add('active');
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+}
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(window._toast);window._toast=setTimeout(()=>t.classList.remove('show'),2600);
+}
+function searchProjects(v){
+  const val=v.toLowerCase().trim();
+  document.querySelectorAll('.project-item').forEach(x=>x.style.display=(!val||x.dataset.name.includes(val))?'block':'none');
+  const ps=document.getElementById('projectSearch');if(ps&&document.activeElement.id==='globalSearch')ps.value=v;
+}
+function filterStatus(status){
+  document.querySelectorAll('.project-item').forEach(x=>x.style.display=(status==='all'||x.dataset.status===status)?'block':'none');
+}
+function searchCatalog(v){
+  const val=v.toLowerCase().trim();
+  document.querySelectorAll('.product-item').forEach(x=>x.style.display=(!val||x.dataset.name.includes(val))?'block':'none');
+}
+function approve(btn){
+  const box=btn.closest('.decision'); if(!box)return;
+  const status=box.querySelector('.status');
+  if(status){status.textContent='Aprovada';status.className='status';}
+  btn.remove();
+  toast('Aprovação registrada no histórico do projeto.');
+}
+function exportMemorial(name){
+  if(!PLANS[currentPlan].memorialExport){toast('Exportação de memorial disponível no plano Hefesto.');return}
+  const content=`HEFESTOS — MEMORIAL DESCRITIVO\\nProjeto: ${name}\\nVersão: 7\\nAtualizado: 17/09/2026\\n\\nAMBIENTE | ITEM | PRODUTO | FABRICANTE\\nSala de estar | Piso | Cement Gray | Portobello\\nCozinha | Piso | Urban | Portobello\\nCozinha | Bancada | Aura | Dekton\\nSuíte | Revestimento | Urban Gray | Decortiles`;
+  const blob=new Blob([content],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='memorial-'+name.toLowerCase().replaceAll(' ','-')+'.txt';a.click();URL.revokeObjectURL(a.href);toast('Memorial exportado com sucesso.');
+}
+if(sessionStorage.getItem('hefestosLogged')==='1'){
+  document.getElementById('login').style.display='none';
+  document.getElementById('landing').style.display='none';
+  renderGating();
+}else{
+  document.getElementById('login').style.display='none';
+  document.getElementById('landing').style.display='block';
+}
+</script>
+</body>
+</html>
